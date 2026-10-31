@@ -1,0 +1,16 @@
+{
+  "name": "HEMS CFO Analytics",
+  "short_name": "HEMS CFO",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "description": "Executive HEMS Financial Energy Analytics for Duffel",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
