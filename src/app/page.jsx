@@ -23,7 +23,12 @@ import {
   Info,
   ChevronRight,
   ExternalLink,
-  CheckCircle2
+  CheckCircle2,
+  HelpCircle,
+  CheckSquare,
+  Gift,
+  Target,
+  FileText
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -45,14 +50,14 @@ export default function CFODashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('market'); // default to market comparator as requested!
+  const [activeTab, setActiveTab] = useState('decision'); // Default directly to CFO Decision Board!
   const [selectedWeek, setSelectedWeek] = useState(null);
 
   // Switch Simulator state (interactive what-if sliders)
   const [simImport, setSimImport] = useState(3650);
   const [simExport, setSimExport] = useState(4100);
   const [simGas, setSimGas] = useState(1250);
-  const [simMarketShift, setSimMarketShift] = useState(0); // -30% to +50%
+  const [simMarketShift, setSimMarketShift] = useState(0);
 
   const fetchData = async () => {
     setLoading(true);
@@ -83,14 +88,12 @@ export default function CFODashboard() {
     if (!data?.market?.contracts) return [];
     const shiftFactor = 1 + (simMarketShift / 100);
 
-    // Calculate baseline current contract cost
     const baselineElec = (1456 * (simImport / 3650)) * shiftFactor;
     const baselineGas = (1228 * (simGas / 1250)) * shiftFactor;
     const baselineInj = (simExport * 0.0292) * shiftFactor;
     const baselineNet = baselineElec + baselineGas - baselineInj;
 
     return data.market.contracts.map(c => {
-      // Dynamic adjustments
       let elec = (c.elec_cost_eur * (simImport / 3650)) * shiftFactor;
       let gas = (c.gas_cost_eur * (simGas / 1250)) * shiftFactor;
       let inj = (simExport * (c.inj_rate_c_kwh / 100)) * (c.id === 'engie_easy_vast' ? 1 : shiftFactor);
@@ -140,6 +143,8 @@ export default function CFODashboard() {
   const { summary, weeks, days, hourly, market } = data;
   const chartWeeks = [...weeks].reverse();
   const bestSwitch = simulatedContracts.find(c => !c.is_current && c.sim_delta > 0);
+  const decisionBoard = market?.decision_board;
+  const gasHead = decisionBoard?.gas_head_to_head;
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 pb-16">
@@ -166,7 +171,7 @@ export default function CFODashboard() {
           {/* Quick CFO Switch Alert Badge */}
           {bestSwitch && (
             <div 
-              onClick={() => setActiveTab('market')}
+              onClick={() => setActiveTab('decision')}
               className="cursor-pointer flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-indigo-950/50 border border-indigo-500/30 hover:border-indigo-400 transition"
             >
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -194,15 +199,26 @@ export default function CFODashboard() {
         {/* Tab Bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-2 overflow-x-auto py-2">
           <button
+            onClick={() => setActiveTab('decision')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              activeTab === 'decision'
+                ? 'bg-gradient-to-r from-emerald-600 to-indigo-600 text-white shadow-md shadow-emerald-950/50'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <Award className="w-4 h-4" />
+            CFO Decision Board & Roadmap
+          </button>
+          <button
             onClick={() => setActiveTab('market')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
               activeTab === 'market'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/50'
+                ? 'bg-slate-800 text-white shadow'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
             <ArrowRightLeft className="w-4 h-4" />
-            Marktvergelijker & Switch Simulator
+            Marktvergelijker & Simulator
           </button>
           <button
             onClick={() => setActiveTab('cockpit')}
@@ -224,7 +240,7 @@ export default function CFODashboard() {
             }`}
           >
             <Calendar className="w-4 h-4" />
-            Wekelijkse Drill-Down ({weeks.length} Weken)
+            Wekelijkse Drill-Down ({weeks.length} Wkn)
           </button>
           <button
             onClick={() => setActiveTab('trends')}
@@ -235,7 +251,7 @@ export default function CFODashboard() {
             }`}
           >
             <Flame className="w-4 h-4" />
-            Seizoensgraaddagen & Verwarming
+            Seizoensgraaddagen (HDD)
           </button>
         </div>
       </header>
@@ -243,39 +259,287 @@ export default function CFODashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
         {/* ========================================================================= */}
-        {/* TAB 1: BELGISCHE MARKTVERGELIJKER & DYNAMISCHE SWITCH SIMULATOR */}
+        {/* TAB 0: CFO DECISION BOARD & STRATEGIC ROADMAP */}
         {/* ========================================================================= */}
-        {activeTab === 'market' && (
+        {activeTab === 'decision' && (
           <div className="space-y-6">
-            
-            {/* Executive Strategy Hero Card */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-950/70 via-slate-900 to-emerald-950/40 border border-indigo-500/30 p-6 shadow-xl">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-2 max-w-2xl">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    <Award className="w-3.5 h-3.5" />
-                    CFO Arbitrage Beslissingsmatrix · Vlaamse Energiemarkt Q4 2026
+
+            {/* Hero Decision Verdict */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-950/80 via-slate-900 to-emerald-950/50 border border-indigo-500/40 p-6 sm:p-8 shadow-2xl">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="space-y-3 max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    CFO Executive Besluitvorming · Energiemarkt België
                   </div>
-                  <h2 className="text-2xl font-black tracking-tight text-white">
-                    Structureel <span className="text-emerald-400">+€{bestSwitch?.sim_delta || 563} / jaar</span> besparen door contract-switch
+                  <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                    Verdikt Gas: <span className="text-emerald-400">Ja, de Welkomstkorting (-€155)</span> is €123 méér waard dan Dats 24!
                   </h2>
                   <p className="text-sm text-slate-300 leading-relaxed">
-                    Jouw woning heeft een uniek verbruiksprofiel met <strong>4.100 kWh zonne-injectie</strong> en <strong>1.250 m³ gas</strong>. 
-                    Bij Mega krijg je slechts <strong className="text-amber-300">2,92 c€/kWh</strong> voor injectie, terwijl 
-                    <strong className="text-emerald-300"> Ecopower</strong> je <strong className="text-emerald-300">6,50 c€/kWh</strong> betaalt zónder vast recht!
+                    Bij jouw jaarverbruik van <strong>1.250 m³ gas</strong> (waarvan 1.000 m³ in de winter) levert Dats 24 een faire besparing op van <strong>+€118/jaar</strong>. 
+                    Maar een contract met eenmalige welkomstbonus (zoals <strong>Engie Flow Gas Promo</strong>) verlaagt je netto jaarkost naar <strong>€987,-</strong> en levert je 
+                    <strong className="text-emerald-300 font-bold"> +€241,- netto winst</strong> op! Dat is <strong>€123 extra pure cashflow in Jaar 1</strong> voor 2 minuten overstapwerk.
                   </p>
                 </div>
 
-                <div className="flex flex-row md:flex-col items-center justify-around md:justify-center p-4 rounded-xl bg-slate-900/80 border border-slate-700/60 min-w-[220px] text-center gap-2">
-                  <div className="text-xs uppercase tracking-wider text-slate-400 font-bold">Jaarlijkse Netto Winst</div>
-                  <div className="text-3xl font-black text-emerald-400">+€{bestSwitch?.sim_delta || 563}</div>
-                  <div className="text-xs text-slate-400">
-                    = <strong>+€{Math.round((bestSwitch?.sim_delta || 563) / 12)} / maand</strong> cashflow voordeel
+                <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-center p-5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 text-center gap-2 min-w-[240px] shadow-xl">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Gecombineerde Jaarwinst</span>
+                  <div className="text-4xl font-black text-emerald-400">
+                    +€{decisionBoard?.combined_roi?.total_annual_gain_eur || 463},-
+                  </div>
+                  <span className="text-xs text-slate-300">
+                    (Gas Promo: +€241 · Stroom Ecopower: +€222)
+                  </span>
+                  <div className="mt-2 text-[11px] font-bold text-indigo-300 bg-indigo-950/60 px-3 py-1 rounded-lg border border-indigo-500/30">
+                    Effectief Uurloon Switch: €{decisionBoard?.combined_roi?.hourly_wage_switch || 2778}/uur
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Head-to-Head Gas Comparison Cards */}
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <Flame className="w-5 h-5 text-orange-400" />
+                    Aardgas Head-to-Head: Mega (Huidig) vs. Dats 24 vs. Welkomstpromo
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Exact berekend op 1.250 m³ gas/jaar (Duffel) inclusief nettarieven en btw
+                  </p>
+                </div>
+                <span className="text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700">
+                  Stookseizoen Ingang: 1 December 2026
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* 1. Huidig Mega */}
+                <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-6 flex flex-col justify-between shadow-lg">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Baseline</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">Huidig Contract</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-white">Mega Smart Gas</h4>
+                    <div className="text-3xl font-black text-slate-200">
+                      €{gasHead?.current_mega?.annual_cost_eur || 1228} <span className="text-xs font-normal text-slate-400">/ jaar</span>
+                    </div>
+                    <div className="space-y-1.5 text-xs text-slate-400 pt-2 border-t border-slate-800">
+                      <div className="flex justify-between"><span>Tarief per m³:</span><strong className="text-slate-200">€0,93 / m³</strong></div>
+                      <div className="flex justify-between"><span>Vast Recht:</span><strong className="text-slate-200">€65 / jaar</strong></div>
+                      <div className="flex justify-between"><span>Winterkost (Nov-Mrt):</span><strong className="text-amber-400">€980</strong></div>
+                      <div className="flex justify-between"><span>Welkomstbonus:</span><span className="text-slate-500">€0</span></div>
+                    </div>
+                  </div>
+                  <div className="mt-5 pt-3 border-t border-slate-800 text-xs text-rose-400 font-semibold flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span>Betaalt momenteel €241/jaar te veel</span>
+                  </div>
+                </div>
+
+                {/* 2. Dats 24 (Fair Price) */}
+                <div className="rounded-2xl bg-slate-900/80 border border-slate-700 p-6 flex flex-col justify-between shadow-lg relative">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-blue-400">Optie A: Fair Price</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Zonder Promo</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-white">Dats 24 / Energie.be</h4>
+                    <div className="text-3xl font-black text-blue-300">
+                      €{gasHead?.dats_standard?.annual_cost_eur || 1110} <span className="text-xs font-normal text-slate-400">/ jaar</span>
+                    </div>
+                    <div className="space-y-1.5 text-xs text-slate-400 pt-2 border-t border-slate-800">
+                      <div className="flex justify-between"><span>Tarief per m³:</span><strong className="text-slate-200">€0,86 / m³</strong></div>
+                      <div className="flex justify-between"><span>Vast Recht:</span><strong className="text-slate-200">€35 / jaar</strong></div>
+                      <div className="flex justify-between"><span>Winterkost (Nov-Mrt):</span><strong className="text-blue-300">€885</strong></div>
+                      <div className="flex justify-between"><span>Welkomstbonus:</span><span className="text-slate-500">Geen</span></div>
+                    </div>
+                  </div>
+                  <div className="mt-5 pt-3 border-t border-slate-800 space-y-2">
+                    <div className="text-xs text-emerald-400 font-bold flex items-center justify-between">
+                      <span>Besparing vs Mega:</span>
+                      <span>+€{gasHead?.dats_standard?.annual_saving_eur || 118} / jr</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-tight">
+                      Ideaal voor wie <em>nooit</em> meer wil omkijken en geen kalenderherinnering wil zetten.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 3. Engie / Luminus Promo (Promo-Hopper) */}
+                <div className="rounded-2xl bg-gradient-to-b from-emerald-950/30 via-slate-900 to-slate-900 border-2 border-emerald-500 p-6 flex flex-col justify-between shadow-2xl relative">
+                  <div className="absolute -top-3 right-4 px-3 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-slate-950 uppercase tracking-wider shadow">
+                    Aanbevolen door CFO
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Optie B: Welkomstbonus</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        1e Jaars Promo
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-bold text-white">Engie Flow / Luminus Gas</h4>
+                    <div className="text-3xl font-black text-emerald-400">
+                      €{gasHead?.promo_hopper?.annual_cost_eur || 987} <span className="text-xs font-normal text-slate-400">/ jaar</span>
+                    </div>
+                    <div className="space-y-1.5 text-xs text-slate-400 pt-2 border-t border-slate-800">
+                      <div className="flex justify-between"><span>Tarief per m³:</span><strong className="text-slate-200">€0,87 / m³</strong></div>
+                      <div className="flex justify-between"><span>Vast Recht:</span><strong className="text-slate-200">€55 / jaar</strong></div>
+                      <div className="flex justify-between"><span>Welkomstbonus:</span><strong className="text-emerald-400 font-bold">-€155 eenmalig</strong></div>
+                      <div className="flex justify-between"><span>Winterkost (Nov-Mrt):</span><strong className="text-emerald-300 font-bold">€785</strong></div>
+                    </div>
+                  </div>
+                  <div className="mt-5 pt-3 border-t border-slate-800 space-y-2">
+                    <div className="text-xs text-emerald-400 font-black flex items-center justify-between text-sm">
+                      <span>Totale Winst vs Mega:</span>
+                      <span>+€{gasHead?.promo_hopper?.saving_vs_mega_eur || 241} / jr</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 font-semibold">
+                      💡 Levert <strong>€123 méér netto cash</strong> op dan Dats 24! Vereist na 11 maanden één nieuwe switch.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Strategic Roadmap & Timeline (CFO Gantt Action Plan) */}
+            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 sm:p-7 shadow-xl space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                    <Target className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">
+                      CFO Uitvoerings-Roadmap: Tijdlijn & Concrete Stappen
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Gefaseerd stappenplan voor maximale energie-arbitrage zonder administratieve rompslomp
+                    </p>
+                  </div>
+                </div>
+                <div className="text-xs text-slate-400 font-mono">
+                  Opzegtermijn Vlaanderen: <strong>21-30 dagen (kosteloos)</strong>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {decisionBoard?.roadmap_milestones?.map((m) => (
+                  <div 
+                    key={m.step} 
+                    className={`p-4 sm:p-5 rounded-xl border transition ${
+                      m.urgency === 'Dringend' 
+                        ? 'bg-emerald-950/20 border-emerald-500/40 shadow-md' 
+                        : 'bg-slate-950/60 border-slate-800'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${
+                          m.urgency === 'Dringend' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                        }`}>
+                          {m.step}
+                        </span>
+                        <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
+                          {m.phase} · {m.timing}
+                        </span>
+                      </div>
+                      <span className={`self-start sm:self-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        m.urgency === 'Dringend' ? 'bg-red-500/20 text-red-300 border border-red-500/30 animate-pulse' :
+                        m.urgency === 'Gepland' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                        'bg-slate-800 text-slate-400'
+                      }`}>
+                        {m.urgency}
+                      </span>
+                    </div>
+
+                    <div className="sm:pl-9 space-y-1.5">
+                      <h4 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                        {m.action}
+                        <span className="text-xs font-normal text-slate-400">(Ingang: {m.target_start})</span>
+                      </h4>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        {m.details}
+                      </p>
+                      <div className="pt-2 text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Verwacht Rendement: {m.expected_gain}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Action Center (Direct Switch Links & EAN Cheat-Sheet) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-3 shadow-lg">
+                <div className="flex items-center gap-2 text-white font-bold text-sm">
+                  <ExternalLink className="w-4 h-4 text-emerald-400" />
+                  Direct Aanvragen (2 Minuten Online)
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Je hoeft Mega <strong>niet</strong> zelf te contacteren. De nieuwe leverancier zegt je contract bij Mega automatisch op per 1 december 2026.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <a 
+                    href="https://www.mijnenergie.be/" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition"
+                  >
+                    <span>Mijnenergie Welkomstdeals</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                  <a 
+                    href="https://vtest.vreg.be/" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition"
+                  >
+                    <span>Officiële VREG V-Test</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-2 shadow-lg">
+                <div className="flex items-center gap-2 text-white font-bold text-sm">
+                  <FileText className="w-4 h-4 text-indigo-400" />
+                  Duffel Contract-Profiel (Gegevens voor Aanvraag)
+                </div>
+                <div className="space-y-1 text-xs text-slate-300 font-mono pt-1">
+                  <div className="flex justify-between border-b border-slate-800/80 py-1">
+                    <span className="text-slate-400">Netbeheerder:</span>
+                    <strong>Fluvius (Antwerpen / Duffel)</strong>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-800/80 py-1">
+                    <span className="text-slate-400">Jaarverbruik Aardgas:</span>
+                    <strong>1.250 m³ (ca. 14.200 kWh)</strong>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-800/80 py-1">
+                    <span className="text-slate-400">Jaarafname Elektriciteit:</span>
+                    <strong>3.650 kWh (Digitale meter)</strong>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="text-slate-400">Jaarinjectie Zonnepanelen:</span>
+                    <strong className="text-amber-300">4.100 kWh</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 1: BELGISCHE MARKTVERGELIJKER & DYNAMISCHE SWITCH SIMULATOR */}
+        {/* ========================================================================= */}
+        {activeTab === 'market' && (
+          <div className="space-y-6">
+            
             {/* What-If Scenario Sliders (Interactive Simulator) */}
             <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-6 shadow-lg space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
@@ -496,17 +760,9 @@ export default function CFODashboard() {
 
             {/* Provider Cost Breakdown Chart */}
             <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-xl space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
-                <div>
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                    Kostenopbouw per Leverancier (Stroom vs Gas vs Injectieaftrek)
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    Netto kost = Stroom + Gas - Injectievergoeding
-                  </p>
-                </div>
-              </div>
-
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                Kostenopbouw per Leverancier (Stroom vs Gas vs Injectieaftrek)
+              </h3>
               <div className="h-80 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
@@ -530,50 +786,6 @@ export default function CFODashboard() {
               </div>
             </div>
 
-            {/* "Wanneer Switchen?" Strategic Decision Playbook */}
-            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-xl space-y-6">
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
-                <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">
-                    CFO Beslissings-Playbook: "Wanneer & Waarom Moet Er Een Switch Komen?"
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    Duidelijke seizoens- en markttriggers voor maximale cashflow optimalisatie
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {market.switch_strategy.triggers.map((trig, idx) => (
-                  <div key={idx} className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">
-                        {trig.season}
-                      </span>
-                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                        {trig.urgency}
-                      </span>
-                    </div>
-                    <h4 className="text-sm font-bold text-slate-200">{trig.title}</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">{trig.description}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/30 flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                <div className="text-xs text-slate-300 leading-relaxed">
-                  <strong className="text-emerald-300 font-bold block mb-1">Concreet Actieadvies voor Kristof:</strong>
-                  1. <strong>Stap voor stroom over naar Ecopower</strong> (of Octopus Dynamic). Gezien het 4.100 kWh injectievolume levert dit direct €146 tot €220 pure injectiewinst op, plus het wegvallen van €75 vast recht.
-                  2. <strong>Koppel aardgas los naar een scherpe variabele speler</strong> (zoals Dats 24 of Octopus Gas). Dit verlaagt je m³-prijs van €0,93 naar €0,86 net nu het stookseizoen start.
-                  3. <strong>Totale jaarlijkse netto winst: €563,-</strong> zonder enige verandering aan comfort of HEMS automatisaties.
-                </div>
-              </div>
-            </div>
-
           </div>
         )}
 
@@ -582,7 +794,6 @@ export default function CFODashboard() {
         {/* ========================================================================= */}
         {activeTab === 'cockpit' && (
           <div className="space-y-6">
-            {/* Top KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
                 <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
@@ -638,7 +849,6 @@ export default function CFODashboard() {
               </div>
             </div>
 
-            {/* Historical Cost Chart */}
             <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider">
                 Wekelijks Verloop: Elektriciteit (€) vs Aardgas (€) (30 Weken)
@@ -664,7 +874,7 @@ export default function CFODashboard() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 3: WEKELIJKSE DRILL-DOWN (30 WEKEN MET SELECTIE) */}
+        {/* TAB 3: WEKELIJKSE DRILL-DOWN (30 WEKEN) */}
         {/* ========================================================================= */}
         {activeTab === 'weekly' && (
           <div className="space-y-6">

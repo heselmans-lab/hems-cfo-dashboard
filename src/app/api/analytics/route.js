@@ -97,7 +97,6 @@ export async function GET(request) {
     const hourly = (hourlyRes.rows || []).reverse();
 
     // 5. Market Comparator Profiles & Real-time Belgian Benchmarks
-    // Calibrated for Duffel profile: 3,650 kWh grid import, 4,100 kWh solar injection, 1,250 m3 gas, 4.5 kW peak
     const market = {
       profile: {
         annual_import_kwh: 3650,
@@ -116,7 +115,7 @@ export async function GET(request) {
         elec_import_cost_eur: 1456,
         gas_cost_eur: 1228,
         injection_tariff_c_kwh: 2.92,
-        solar_inj_credit_eur: 120, // 4100 kWh * 0.0292
+        solar_inj_credit_eur: 120,
         net_annual_total_eur: 2564,
       },
       contracts: [
@@ -130,7 +129,7 @@ export async function GET(request) {
           formula_elec: 'Belpex Spot + 1,35 c€/kWh + €75 vast',
           formula_gas: 'TTF Index + 0,35 c€/kWh + €65 vast',
           inj_rate_c_kwh: 2.92,
-          fixed_fee_annual_eur: 140, // 75 elec + 65 gas
+          fixed_fee_annual_eur: 140,
           elec_cost_eur: 1456,
           gas_cost_eur: 1228,
           inj_credit_eur: 119.72,
@@ -151,10 +150,10 @@ export async function GET(request) {
           formula_elec: 'Kostprijsformule · €0 VAST RECHT',
           formula_gas: 'Gecombineerd met Dats 24 / Energie.be gas (€0,86/m³)',
           inj_rate_c_kwh: 6.50,
-          fixed_fee_annual_eur: 35, // €0 stroom, €35 gas
+          fixed_fee_annual_eur: 35,
           elec_cost_eur: 1158,
           gas_cost_eur: 1110,
-          inj_credit_eur: 266.50, // 4100 kWh * 0.065
+          inj_credit_eur: 266.50,
           net_annual_total_eur: 2001.50,
           delta_vs_current_eur: 562.78,
           delta_pct: 22.0,
@@ -172,7 +171,7 @@ export async function GET(request) {
           formula_elec: 'EPEX Spot + 0,15 c€/kWh + €45 vast',
           formula_gas: 'TTF spot index + €35 vast (€0,86/m³)',
           inj_rate_c_kwh: 5.20,
-          fixed_fee_annual_eur: 80, // 45 + 35
+          fixed_fee_annual_eur: 80,
           elec_cost_eur: 1226,
           gas_cost_eur: 1110,
           inj_credit_eur: 213.20,
@@ -269,7 +268,7 @@ export async function GET(request) {
         }
       ],
       switch_strategy: {
-        recommended_action: 'Switch Stroom naar Ecopower + Gas naar Dats 24 / Octopus',
+        recommended_action: 'Switch Stroom naar Ecopower + Gas naar Promo-Contract of Dats 24',
         annual_net_benefit_eur: 562.78,
         monthly_net_benefit_eur: 46.90,
         triggers: [
@@ -282,7 +281,7 @@ export async function GET(request) {
           {
             season: 'Winter (November - Februari)',
             title: 'Aardgas Winteroptimalisatie',
-            description: '80% van het gasverbruik valt in deze 5 maanden. Huidig tarief bij Mega is €0,93/m³. Een switch naar Dats 24 / Octopus (€0,86/m³) levert in dit stookseizoen direct €88 tot €115 netto besparing op.',
+            description: '80% van het gasverbruik valt in deze 5 maanden. Huidig tarief bij Mega is €0,93/m³. Een switch naar Dats 24 (€0,86/m³) levert €118/jr op, maar een welkomstbonus-contract (Engie Flow Promo) levert zelfs €241/jr op!',
             urgency: 'Direct toepasbaar'
           },
           {
@@ -298,6 +297,100 @@ export async function GET(request) {
             urgency: 'Monitoring'
           }
         ]
+      },
+
+      // 6. DEDICATED CFO DECISION BOARD DATA (Gas Promo vs Dats 24 & Roadmap)
+      decision_board: {
+        gas_head_to_head: {
+          profile_volume_m3: 1250,
+          winter_volume_m3: 1000,
+          current_mega: {
+            provider: 'Mega Smart Gas',
+            unit_price_m3: 0.93,
+            fixed_fee_eur: 65,
+            annual_cost_eur: 1228,
+            winter_cost_eur: 980,
+            promo_discount_eur: 0,
+            badge: 'Huidige Baseline',
+            badge_color: 'slate',
+            status: 'Verlieslatend (-€241 te veel)'
+          },
+          dats_standard: {
+            provider: 'Dats 24 / Energie.be Gas',
+            unit_price_m3: 0.86,
+            fixed_fee_eur: 35,
+            annual_cost_eur: 1110,
+            winter_cost_eur: 885,
+            promo_discount_eur: 0,
+            saving_vs_mega_eur: 118,
+            badge: 'Fair Price (Geen Promo)',
+            badge_color: 'blue',
+            status: 'Stabiel (Geen omkijken naar)',
+            cfo_evaluation: 'Eerlijke marktprijs zonder tijdelijke lokvogels. Bespaart €118/jr vs Mega zonder dat je ooit opnieuw hoeft over te stappen.'
+          },
+          promo_hopper: {
+            provider: 'Engie Flow / Luminus Gas (Welkomstpromo)',
+            unit_price_m3: 0.87,
+            fixed_fee_eur: 55,
+            annual_cost_eur: 987,
+            winter_cost_eur: 785,
+            promo_discount_eur: 155,
+            saving_vs_mega_eur: 241,
+            extra_vs_dats_eur: 123,
+            badge: '🏆 #1 Hoogste Rendement (Aanbevolen)',
+            badge_color: 'emerald',
+            status: 'Aanbevolen voor CFO (Max Cash)',
+            cfo_evaluation: 'Absoluut superieur in Jaar 1! De welkomstbonus van €155 levert €123 méér netto cashflow op dan Dats 24. Vereist wel dat je in maand 11 even opnieuw overstapt.'
+          }
+        },
+        roadmap_milestones: [
+          {
+            step: 1,
+            phase: 'ACTIE NU',
+            timing: 'Vóór 10 November 2026',
+            action: 'Switch Aardgas naar Promo-Contract (Engie Flow / Mijnenergie eDeals)',
+            target_start: '1 December 2026',
+            expected_gain: '+€241,- Netto Winst (waarvan €155 eenmalige welkomstbonus)',
+            details: 'Vangt direct 85% van het winterstookseizoen af aan de laagste jaarkost (€987 ipv €1.228).',
+            urgency: 'Dringend'
+          },
+          {
+            step: 2,
+            phase: 'ACTIE VOORJAAR',
+            timing: '15 Februari 2027',
+            action: 'Switch Elektriciteit naar Ecopower (Burgercoöperatie)',
+            target_start: '1 Maart 2027',
+            expected_gain: '+€222,- Zonne-Arbitrage Winst (6,50 c€ injectie + €0 vast recht)',
+            details: 'Start exact gelijk met de zonnepiek. 4.100 kWh injectie brengt €266,50 op in plaats van €120 bij Mega.',
+            urgency: 'Gepland'
+          },
+          {
+            step: 3,
+            phase: 'HEMS RUNTIME',
+            timing: 'Doorlopend 2026 - 2027',
+            action: 'HEMS Dyn-Arbitrage & Pre-heat Sturing',
+            target_start: 'Actief',
+            expected_gain: '+€180 tot €250 Vermeden Prijspieken & Gasvervanging',
+            details: 'Daikin lucht/lucht warmtepompen vangen dagpieken op; Daalderop ketel bewaakt nachtbasis (19,5°C) zonder overdrukrisico.',
+            urgency: 'Actief'
+          },
+          {
+            step: 4,
+            phase: 'JAARLIJKSE AUDIT',
+            timing: 'Oktober 2027 (Maand 11)',
+            action: 'Promo-Hop Check & Vernieuwing',
+            target_start: '1 December 2027',
+            expected_gain: 'Voorkomt terugval naar standaardtarief, herhaalt welkomstbonus',
+            details: 'Vóór afloop van de 12-maanden welkomstkorting opnieuw vergelijken en eventueel doorrollen naar Dats 24 of nieuwe actuele promo.',
+            urgency: 'Kalenderherinnering'
+          }
+        ],
+        combined_roi: {
+          total_annual_gain_eur: 463, // €241 gas promo + €222 stroom ecopower
+          hourly_wage_switch: 2778, // 10 minutes work total = €463 * 6 = €2778/hr
+          action_link_vreg: 'https://vtest.vreg.be/',
+          action_link_mijnenergie: 'https://www.mijnenergie.be/'
+        }
       }
     };
 
