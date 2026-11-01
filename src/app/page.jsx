@@ -54,9 +54,9 @@ export default function CFODashboard() {
   const [selectedWeek, setSelectedWeek] = useState(null);
 
   // Switch Simulator state (interactive what-if sliders)
-  const [simImport, setSimImport] = useState(3650);
-  const [simExport, setSimExport] = useState(4100);
-  const [simGas, setSimGas] = useState(1250);
+  const [simImport, setSimImport] = useState(4452);
+  const [simExport, setSimExport] = useState(4863);
+  const [simGas, setSimGas] = useState(1267);
   const [simMarketShift, setSimMarketShift] = useState(0);
 
   const fetchData = async () => {
@@ -88,14 +88,14 @@ export default function CFODashboard() {
     if (!data?.market?.contracts) return [];
     const shiftFactor = 1 + (simMarketShift / 100);
 
-    const baselineElec = (1456 * (simImport / 3650)) * shiftFactor;
-    const baselineGas = (1228 * (simGas / 1250)) * shiftFactor;
+    const baselineElec = (1456 * (simImport / 4452)) * shiftFactor;
+    const baselineGas = (1228 * (simGas / 1267)) * shiftFactor;
     const baselineInj = (simExport * 0.0292) * shiftFactor;
     const baselineNet = baselineElec + baselineGas - baselineInj;
 
     return data.market.contracts.map(c => {
-      let elec = (c.elec_cost_eur * (simImport / 3650)) * shiftFactor;
-      let gas = (c.gas_cost_eur * (simGas / 1250)) * shiftFactor;
+      let elec = (c.elec_cost_eur * (simImport / 4452)) * shiftFactor;
+      let gas = (c.gas_cost_eur * (simGas / 1267)) * shiftFactor;
       let inj = (simExport * (c.inj_rate_c_kwh / 100)) * (c.id === 'engie_easy_vast' ? 1 : shiftFactor);
       let net = elec + gas - inj;
       let delta = baselineNet - net;
@@ -145,6 +145,8 @@ export default function CFODashboard() {
   const bestSwitch = simulatedContracts.find(c => !c.is_current && c.sim_delta > 0);
   const decisionBoard = market?.decision_board;
   const gasHead = decisionBoard?.gas_head_to_head;
+  const mijnenergieAudit = market?.mijnenergie_audit;
+  const fluvius = mijnenergieAudit?.fluvius_profile;
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 pb-16">
@@ -270,29 +272,186 @@ export default function CFODashboard() {
                 <div className="space-y-3 max-w-3xl">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     <Sparkles className="w-4 h-4 text-emerald-400" />
-                    CFO Executive Besluitvorming · Energiemarkt België
+                    CFO Executive Besluitvorming · Fluvius Duffel Audit
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                    Verdikt Gas: <span className="text-emerald-400">Ja, de Welkomstkorting (-€155)</span> is €123 méér waard dan Dats 24!
+                    HEMS Optimale Arbitrage: <span className="text-emerald-400">€2.622/jaar</span> verslaat Mijnenergie met €238/jaar!
                   </h2>
                   <p className="text-sm text-slate-300 leading-relaxed">
-                    Bij jouw jaarverbruik van <strong>1.250 m³ gas</strong> (waarvan 1.000 m³ in de winter) levert Dats 24 een faire besparing op van <strong>+€118/jaar</strong>. 
-                    Maar een contract met eenmalige welkomstbonus (zoals <strong>Engie Flow Gas Promo</strong>) verlaagt je netto jaarkost naar <strong>€987,-</strong> en levert je 
-                    <strong className="text-emerald-300 font-bold"> +€241,- netto winst</strong> op! Dat is <strong>€123 extra pure cashflow in Jaar 1</strong> voor 2 minuten overstapwerk.
+                    Mijnenergie.be beveelt <strong>Luminus ComfyFlex (€2.860/jr)</strong> aan dankzij een lokkorting van -€958,98. 
+                    Maar door het splitsen van contracten (<strong>Engie Easy Fixed Gas</strong> met -€441 welkomstbonus + <strong>Ecopower Stroom</strong> met 6,5c/kWh injectie voor jouw 4.863 kWh zonne-overschot) 
+                    bespaar je <strong className="text-emerald-300 font-bold">€238 extra per jaar</strong> én vermijd je de brutoprijs-valkuil van Luminus in jaar 2!
                   </p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-center p-5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 text-center gap-2 min-w-[240px] shadow-xl">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Gecombineerde Jaarwinst</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Totale Winst vs Mega</span>
                   <div className="text-4xl font-black text-emerald-400">
-                    +€{decisionBoard?.combined_roi?.total_annual_gain_eur || 463},-
+                    +€374,-
                   </div>
                   <span className="text-xs text-slate-300">
-                    (Gas Promo: +€241 · Stroom Ecopower: +€222)
+                    (Bespaart €238 vs Luminus Mijnenergie)
                   </span>
                   <div className="mt-2 text-[11px] font-bold text-indigo-300 bg-indigo-950/60 px-3 py-1 rounded-lg border border-indigo-500/30">
-                    Effectief Uurloon Switch: €{decisionBoard?.combined_roi?.hourly_wage_switch || 2778}/uur
+                    Netto Jaarkost: €2.622,- / jaar
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mijnenergie.be Reality Check & Fluvius Audit */}
+            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 sm:p-7 shadow-xl space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                    <HelpCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-bold text-white">
+                        Mijnenergie.be Reality Check & Audit
+                      </h3>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        Fluvius Duffel Data Gekoppeld
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Waarom beveelt Mijnenergie Luminus ComfyFlex (€2.860) aan en hoe verslaat de HEMS CFO Arbitrage hen met €238/jaar?
+                    </p>
+                  </div>
+                </div>
+                <div className="text-xs text-slate-400 font-mono flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Kruisstraat 2570 Duffel</span>
+                </div>
+              </div>
+
+              {/* 4 Inzichten Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+                    1. Commerciële Bias
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Mijnenergie toont enkel leveranciers die <strong>commissie betalen</strong>. Coöperaties zoals <strong>Ecopower</strong> weigeren advertentiekosten en worden categorisch geweerd.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-rose-300">
+                    <Gift className="w-4 h-4 shrink-0 text-rose-400" />
+                    2. De Welkomst-Illusie
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Luminus ComfyFlex kost bruto <strong>€3.819/jaar</strong>! Enkel door <strong>-€958,98 éénmalige korting</strong> zakt het naar €2.860. In jaar 2 schiet je factuur met +€959 omhoog.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-300">
+                    <ArrowRightLeft className="w-4 h-4 shrink-0 text-blue-400" />
+                    3. De "Dual Fuel" Valkuil
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Mijnenergie pusht om stroom en gas samen te nemen. Splits je op Mijnenergie zelf (Engie Gas + Luminus Stroom), dan betaal je <strong>€2.713/jaar</strong> (direct <strong>€147 goedkoper</strong>!).
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
+                    <Sun className="w-4 h-4 shrink-0 text-emerald-400" />
+                    4. Zonne-injectie Genegeerd
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Je injecteert <strong>4.863 kWh zon</strong>! Luminus geeft amper ~3,8 c€/kWh, terwijl Ecopower <strong>6,50 c€/kWh (€316/jaar pure cash)</strong> én <strong>€0 vast recht</strong> biedt.
+                  </p>
+                </div>
+              </div>
+
+              {/* The Head to Head Matrix Table */}
+              <div className="rounded-xl border border-slate-800 overflow-hidden">
+                <div className="bg-slate-950/80 px-4 py-2.5 border-b border-slate-800 text-xs font-bold text-slate-300 flex justify-between items-center">
+                  <span>Reële Contract-Rangschikking voor Duffel (4.452 kWh Import · 4.863 kWh Injectie · 14.316 kWh Gas)</span>
+                  <span className="text-[10px] text-slate-500 font-mono">Fluvius data</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-slate-950 border-b border-slate-800/80 text-slate-400 uppercase text-[10px] tracking-wider font-mono">
+                        <th className="py-2.5 px-4">Rang & Strategie</th>
+                        <th className="py-2.5 px-3">Bron</th>
+                        <th className="py-2.5 px-3 text-right">Netto Jaarkost</th>
+                        <th className="py-2.5 px-3 text-right">Korting / Bonus</th>
+                        <th className="py-2.5 px-4 text-right font-bold">Winst vs Mijnenergie #1</th>
+                        <th className="py-2.5 px-4">CFO Oordeel</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 font-mono">
+                      {mijnenergieAudit?.benchmark_table?.map((item) => {
+                        const isWinnaar = item.rank === 1;
+                        const isLuminus = item.rank === 3;
+                        return (
+                          <tr 
+                            key={item.rank} 
+                            className={`transition ${
+                              isWinnaar ? 'bg-emerald-950/30 font-semibold' :
+                              isLuminus ? 'bg-amber-950/20' :
+                              'hover:bg-slate-800/30'
+                            }`}
+                          >
+                            <td className="py-3 px-4 font-sans">
+                              <div className="font-bold text-white text-xs flex items-center gap-2">
+                                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
+                                  isWinnaar ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                                }`}>
+                                  {item.rank}
+                                </span>
+                                <span>{item.name}</span>
+                              </div>
+                              <div className="text-[11px] text-slate-400 mt-0.5">{item.details}</div>
+                            </td>
+                            <td className="py-3 px-3 font-sans text-slate-400 text-[11px]">{item.source}</td>
+                            <td className="py-3 px-3 text-right font-bold text-white text-sm">
+                              €{item.annual_cost_eur.toLocaleString('nl-BE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              <span className="block text-[10px] font-normal text-slate-400">€{item.monthly_cost_eur}/mnd</span>
+                            </td>
+                            <td className="py-3 px-3 text-right text-emerald-400">
+                              {item.welcome_bonus_eur > 0 ? (
+                                <span>-€{item.welcome_bonus_eur.toFixed(2)}</span>
+                              ) : (
+                                <span className="text-slate-500">—</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-right font-bold">
+                              {item.saving_vs_luminus_combi > 0 ? (
+                                <span className="text-emerald-400 text-xs font-black">
+                                  +€{item.saving_vs_luminus_combi.toFixed(2)} / jr
+                                </span>
+                              ) : item.saving_vs_luminus_combi === 0 ? (
+                                <span className="text-amber-400 text-xs">Aanbeveling #1</span>
+                              ) : (
+                                <span className="text-rose-400 text-xs">
+                                  -€{Math.abs(item.saving_vs_luminus_combi).toFixed(2)} / jr
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 font-sans text-xs">
+                              <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
+                                isWinnaar ? 'bg-emerald-500 text-slate-950' :
+                                item.rank === 2 ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                                isLuminus ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                                item.rank === 4 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
+                                'bg-slate-800 text-slate-400'
+                              }`}>
+                                {item.category}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -506,26 +665,39 @@ export default function CFODashboard() {
               </div>
 
               <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-2 shadow-lg">
-                <div className="flex items-center gap-2 text-white font-bold text-sm">
-                  <FileText className="w-4 h-4 text-indigo-400" />
-                  Duffel Contract-Profiel (Gegevens voor Aanvraag)
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-white font-bold text-sm">
+                    <FileText className="w-4 h-4 text-indigo-400" />
+                    Duffel Fluvius Profiel (Officiële Meetdata)
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    Gekoppeld tot 01/11/2029
+                  </span>
                 </div>
                 <div className="space-y-1 text-xs text-slate-300 font-mono pt-1">
                   <div className="flex justify-between border-b border-slate-800/80 py-1">
-                    <span className="text-slate-400">Netbeheerder:</span>
-                    <strong>Fluvius (Antwerpen / Duffel)</strong>
+                    <span className="text-slate-400">Adres & Netbeheerder:</span>
+                    <strong>Kruisstraat, Duffel · Fluvius</strong>
                   </div>
                   <div className="flex justify-between border-b border-slate-800/80 py-1">
-                    <span className="text-slate-400">Jaarverbruik Aardgas:</span>
-                    <strong>1.250 m³ (ca. 14.200 kWh)</strong>
+                    <span className="text-slate-400">EAN Elektriciteit:</span>
+                    <strong className="text-indigo-300">541448860002535528</strong>
                   </div>
                   <div className="flex justify-between border-b border-slate-800/80 py-1">
-                    <span className="text-slate-400">Jaarafname Elektriciteit:</span>
-                    <strong>3.650 kWh (Digitale meter)</strong>
+                    <span className="text-slate-400">Jaarafname / Injectie:</span>
+                    <strong>4.452 kWh / <span className="text-amber-300 font-bold">4.863 kWh</span></strong>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-800/80 py-1">
+                    <span className="text-slate-400">Gem. Maandpiek (Capaciteit):</span>
+                    <strong className="text-slate-200">5,23 kW</strong>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-800/80 py-1">
+                    <span className="text-slate-400">EAN Aardgas:</span>
+                    <strong className="text-orange-300">541448860003166066</strong>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-slate-400">Jaarinjectie Zonnepanelen:</span>
-                    <strong className="text-amber-300">4.100 kWh</strong>
+                    <span className="text-slate-400">Jaarverbruik Aardgas:</span>
+                    <strong className="text-orange-400">14.316 kWh (ca. 1.267 m³)</strong>
                   </div>
                 </div>
               </div>

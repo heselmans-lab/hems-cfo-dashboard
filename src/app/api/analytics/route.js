@@ -85,7 +85,7 @@ export async function GET(request) {
         COALESCE(SUM(total_export_kwh), 0)::float as total_export_kwh,
         COALESCE(SUM(total_gas_m3), 0)::float as total_gas_m3,
         COALESCE(SUM(arbitrage_savings_eur), 0)::float as total_arbitrage_eur,
-        COALESCE(MAX(capacity_peak_max_kw), 4.94)::float as current_peak_kw
+        COALESCE(MAX(capacity_peak_max_kw), 5.23)::float as current_peak_kw
       FROM hems_weekly_economic_kpi;
     `);
 
@@ -96,33 +96,214 @@ export async function GET(request) {
     const days = dailyRes.rows || [];
     const hourly = (hourlyRes.rows || []).reverse();
 
-    // 5. Market Comparator Profiles & Real-time Belgian Benchmarks
+    // 5. Officially Calibrated Profile (Direct Fluvius Digital Meter Coupling 01/11/2026)
+    // Address: Kruisstraat, 2570 Duffel
+    // Stroom EAN: 541448860002535528 (4.452 kWh afname, 4.863 kWh injectie, 5,23 kW piek)
+    // Gas EAN: 541448860003166066 (14.316 kWh / 1.267 m3 gas)
     const market = {
       profile: {
-        annual_import_kwh: 3650,
-        annual_export_kwh: 4100,
-        annual_gas_m3: 1250,
-        annual_gas_kwh: 14200,
-        capacity_peak_kw: 4.5,
-        fluvius_peak_tariff_annual_eur: 205,
+        annual_import_kwh: 4452,
+        annual_export_kwh: 4863,
+        annual_gas_kwh: 14316,
+        annual_gas_m3: 1267,
+        capacity_peak_kw: 5.23,
+        fluvius_peak_tariff_annual_eur: 240,
         current_belpex_spot_eur_kwh: 0.115,
+        ean_elec: '541448860002535528',
+        ean_gas: '541448860003166066',
+        meter_status: 'Gekoppeld via Fluvius tot 01/11/2029'
       },
       current_contract: {
         provider: 'Mega',
         name: 'Smart Dynamisch',
         type: 'Dynamisch (Uurtarief)',
         elec_fixed_eur: 75,
-        elec_import_cost_eur: 1456,
-        gas_cost_eur: 1228,
+        elec_import_cost_eur: 1753,
+        gas_cost_eur: 1243,
         injection_tariff_c_kwh: 2.92,
-        solar_inj_credit_eur: 120,
-        net_annual_total_eur: 2564,
+        solar_inj_credit_eur: 142.00,
+        net_annual_total_eur: 2996.00,
       },
+
+      // MIJNENERGIE.BE DEEP DIVE AUDIT & COMPARISON
+      mijnenergie_audit: {
+        title: "Waarom beveelt Mijnenergie.be iets anders aan dan pure coöperaties?",
+        verdict: "Mijnenergie toont géén coöperaties (zoals Ecopower) omdat die geen commissie betalen. In plaats daarvan pusht Mijnenergie 'Dual Fuel' combideals met gigantische éénmalige welkomstkortingen (Luminus -€959, Engie -€804) die na 12 maanden vervallen.",
+        mechanics: [
+          {
+            title: "1. Commerciële Bias & Geen Coöperaties",
+            icon: "ShieldAlert",
+            desc: "Mijnenergie.be is een commerciële makelaar. Ecopower weigert commissies te betalen aan vergelijkingssites en wordt daarom NOOIT getoond op Mijnenergie, ondanks de hoogste injectievergoeding van Vlaanderen."
+          },
+          {
+            title: "2. De 'Welkomstbonus-Illusie' (Luminus -€958,98)",
+            icon: "Gift",
+            desc: "Luminus ComfyFlex kost bruto €3.819/jaar! Pas door een éénmalige korting van -€958,98 (€490 stroom + €468 gas) daalt het naar €2.860,30. Wie na 11 maanden niet opnieuw switcht, betaalt in jaar 2 de volle pot van bijna €4.000."
+          },
+          {
+            title: "3. 'Dual Fuel' Valkuil vs. Gesplitste eDeals",
+            icon: "Layers",
+            desc: "Mijnenergie zet standaard alles bij 1 leverancier. Maar op hun eigen site is Gas apart bij Engie Easy Fixed (-€441 korting = €1.558) en Stroom apart bij Luminus (-€490 korting = €1.154) samen €2.713. Dat is al direct €147 goedkoper dan de gecombineerde aanbeveling!"
+          },
+          {
+            title: "4. Jouw Unieke 4.863 kWh Zonne-Injectie",
+            icon: "Sun",
+            desc: "Mijnenergie houdt nauwelijks rekening met jouw enorme zonne-injectie (4.863 kWh). Bij Ecopower levert dit 6,50 c€/kWh (€316/jaar pure cash) op met €0 vast recht, terwijl Luminus amper ~3,5 tot 4 c€/kWh biedt."
+          }
+        ],
+        benchmark_table: [
+          {
+            rank: 1,
+            name: "HEMS Optimale Arbitrage (Ecopower Stroom + Engie Gas Promo)",
+            category: "🏆 HEMS #1 Absolute Winnaar",
+            source: "HEMS Strategie (Beste van 2 werelden)",
+            annual_cost_eur: 2622.00,
+            monthly_cost_eur: 218.50,
+            saving_vs_mega: 374.00,
+            saving_vs_luminus_combi: 238.30,
+            welcome_bonus_eur: 441.42,
+            details: "Gas bij Engie Easy Fixed via Mijnenergie (€1.558 met -€441 korting) + Stroom bij Ecopower (€1.064 dankzij €316 zonne-injectie & €0 vast recht). Maximale cashflow en maximale zonne-opbrengst."
+          },
+          {
+            rank: 2,
+            name: "Mijnenergie Gesplitst (Gas Engie Promo + Stroom Luminus Promo)",
+            category: "🎁 Slimste Mijnenergie eDeal Split",
+            source: "Mijnenergie.be (Afzonderlijk gekozen)",
+            annual_cost_eur: 2713.34,
+            monthly_cost_eur: 226.11,
+            saving_vs_mega: 282.66,
+            saving_vs_luminus_combi: 146.96,
+            welcome_bonus_eur: 931.86,
+            details: "Gas bij Engie (€1.558) + Stroom bij Luminus (€1.154). Bespaart direct €147 extra t.o.v. de door Mijnenergie voorgestelde combi."
+          },
+          {
+            rank: 3,
+            name: "Luminus ComfyFlex & ComfyFlex (Dual Fuel Combi)",
+            category: "Mijnenergie Aanbeveling #1",
+            source: "Mijnenergie.be Top Resultaat",
+            annual_cost_eur: 2860.30,
+            monthly_cost_eur: 238.36,
+            saving_vs_mega: 135.70,
+            saving_vs_luminus_combi: 0,
+            welcome_bonus_eur: 958.98,
+            details: "Variabel contract. Bruto €3.819 min €958,98 éénmalige korting. Na 11 maanden verplicht opnieuw hoppen."
+          },
+          {
+            rank: 4,
+            name: "Engie Easy Fixed & Easy Fixed (100% Groen Vast Combi)",
+            category: "Mijnenergie Aanbeveling #2 (Vast)",
+            source: "Mijnenergie.be Vaste Prijs Top",
+            annual_cost_eur: 2867.45,
+            monthly_cost_eur: 238.95,
+            saving_vs_mega: 128.55,
+            saving_vs_luminus_combi: -7.15,
+            welcome_bonus_eur: 804.14,
+            details: "100% VAST tarief voor 12 maanden. Slechts €7/jaar duurder dan Luminus Variabel, maar biedt 100% bescherming tegen winterpieken!"
+          },
+          {
+            rank: 5,
+            name: "Mega Smart (Huidig Dynamisch Baseline)",
+            category: "Huidige Baseline",
+            source: "Huidige Facturatie",
+            annual_cost_eur: 2996.00,
+            monthly_cost_eur: 249.67,
+            saving_vs_mega: 0,
+            saving_vs_luminus_combi: -135.70,
+            welcome_bonus_eur: 0,
+            details: "Huidige situatie bij Mega. Lage afnamemarges maar zeer magere injectie (2,92 c€) en geen welkomstbonussen."
+          }
+        ]
+      },
+
       contracts: [
+        {
+          id: 'hems_optimal_split',
+          provider: 'Ecopower + Engie Promo',
+          name: 'HEMS Optimale Arbitrage (Split)',
+          badge: '🏆 #1 Absolute Winnaar',
+          badge_color: 'emerald',
+          type: 'Coöperatief + Promo Split',
+          formula_elec: 'Ecopower: 6,5c injectie + €0 vast recht',
+          formula_gas: 'Engie Easy Fixed Gas (-€441 Mijnenergie korting)',
+          inj_rate_c_kwh: 6.50,
+          fixed_fee_annual_eur: 55,
+          elec_cost_eur: 1380,
+          gas_cost_eur: 1558,
+          inj_credit_eur: 316.10,
+          net_annual_total_eur: 2622.00,
+          delta_vs_current_eur: 374.00,
+          delta_pct: 12.5,
+          is_recommended: true,
+          action_status: 'Beste Keuze (€238 winst vs Luminus)',
+          highlight: 'Pakt de gigantische €441 welkomstbonus op gas bij Engie mee voor de winter, en haalt met 4.863 kWh injectie bij Ecopower €316/jaar pure opbrengst binnen!'
+        },
+        {
+          id: 'mijnenergie_split',
+          provider: 'Luminus + Engie',
+          name: 'Mijnenergie Gesplitste eDeals',
+          badge: '🎁 Beste Mijnenergie Promo Split',
+          badge_color: 'purple',
+          type: 'Promo-Hop Split',
+          formula_elec: 'Luminus ComfyFlex Stroom (-€490 korting)',
+          formula_gas: 'Engie Easy Fixed Gas (-€441 korting)',
+          inj_rate_c_kwh: 4.00,
+          fixed_fee_annual_eur: 125,
+          elec_cost_eur: 1349,
+          gas_cost_eur: 1558,
+          inj_credit_eur: 194.52,
+          net_annual_total_eur: 2713.34,
+          delta_vs_current_eur: 282.66,
+          delta_pct: 9.4,
+          is_recommended: false,
+          action_status: 'Slimme eDeal Split',
+          highlight: 'Bespaart direct €147 extra ten opzichte van de gecombineerde Luminus aanbieding op Mijnenergie.'
+        },
+        {
+          id: 'luminus_comfyflex_dual',
+          provider: 'Luminus',
+          name: 'ComfyFlex Combi (Mijnenergie #1)',
+          badge: 'Mijnenergie Top Keuze',
+          badge_color: 'amber',
+          type: 'Variabel (Dual Fuel)',
+          formula_elec: 'Luminus ComfyFlex min €490,44 welkomstkorting',
+          formula_gas: 'Luminus ComfyFlex Gas min €468,53 welkomstkorting',
+          inj_rate_c_kwh: 3.80,
+          fixed_fee_annual_eur: 135,
+          elec_cost_eur: 1340,
+          gas_cost_eur: 1705,
+          inj_credit_eur: 184.79,
+          net_annual_total_eur: 2860.30,
+          delta_vs_current_eur: 135.70,
+          delta_pct: 4.5,
+          is_recommended: false,
+          action_status: 'Tijdelijke Promo (€959)',
+          highlight: 'Lijkt voordelig door €959 korting in jaar 1, maar in jaar 2 schiet de kost naar €3.819/jaar door hoge basistarieven.'
+        },
+        {
+          id: 'engie_easy_fixed_dual',
+          provider: 'Engie',
+          name: 'Easy Fixed Combi (Mijnenergie #2)',
+          badge: '🛡️ 100% Vast (Top Veiligheid)',
+          badge_color: 'cyan',
+          type: '100% Groen Vast (12 Mnd)',
+          formula_elec: 'Vaste stroomprijs min €363 korting',
+          formula_gas: 'Vaste gasprijs min €441,42 korting',
+          inj_rate_c_kwh: 3.50,
+          fixed_fee_annual_eur: 140,
+          elec_cost_eur: 1479,
+          gas_cost_eur: 1558,
+          inj_credit_eur: 170.20,
+          net_annual_total_eur: 2867.45,
+          delta_vs_current_eur: 128.55,
+          delta_pct: 4.3,
+          is_recommended: false,
+          action_status: 'Vaste Zekerheid (€804 bonus)',
+          highlight: 'Slechts €7/jaar duurder dan Luminus Variabel, maar beschermt je 12 maanden lang 100% tegen extreme winterprijzen.'
+        },
         {
           id: 'mega_smart',
           provider: 'Mega',
-          name: 'Smart Dynamisch',
+          name: 'Smart Dynamisch (Huidig)',
           badge: 'Huidig Contract',
           badge_color: 'slate',
           type: 'Dynamisch',
@@ -130,268 +311,17 @@ export async function GET(request) {
           formula_gas: 'TTF Index + 0,35 c€/kWh + €65 vast',
           inj_rate_c_kwh: 2.92,
           fixed_fee_annual_eur: 140,
-          elec_cost_eur: 1456,
-          gas_cost_eur: 1228,
-          inj_credit_eur: 119.72,
-          net_annual_total_eur: 2564.28,
+          elec_cost_eur: 1895,
+          gas_cost_eur: 1243,
+          inj_credit_eur: 142.00,
+          net_annual_total_eur: 2996.00,
           delta_vs_current_eur: 0,
           delta_pct: 0,
           is_current: true,
           action_status: 'Huidige baseline',
-          highlight: 'Lage afnamemarge, maar zwakke injectievergoeding (slechts 2,92 c€/kWh) waardoor je op je zonnestroom geld laat liggen.'
-        },
-        {
-          id: 'ecopower',
-          provider: 'Ecopower',
-          name: 'Burgerstroom & Zon (Coöperatief)',
-          badge: '🏆 #1 Hoogste Zonne-Opbrengst',
-          badge_color: 'emerald',
-          type: 'Coöperatief Variabel',
-          formula_elec: 'Kostprijsformule · €0 VAST RECHT',
-          formula_gas: 'Gecombineerd met Dats 24 / Energie.be gas (€0,86/m³)',
-          inj_rate_c_kwh: 6.50,
-          fixed_fee_annual_eur: 35,
-          elec_cost_eur: 1158,
-          gas_cost_eur: 1110,
-          inj_credit_eur: 266.50,
-          net_annual_total_eur: 2001.50,
-          delta_vs_current_eur: 562.78,
-          delta_pct: 22.0,
-          is_recommended: true,
-          action_status: 'Aanbevolen Switch (Structureel)',
-          highlight: '€0 vaste kosten voor elektriciteit en met 6,50 c€/kWh de hoogste injectievergoeding in Vlaanderen! Brengt €266,50 per jaar pure opbrengst op je 4.100 kWh injectie.'
-        },
-        {
-          id: 'octopus_dynamic',
-          provider: 'Octopus Energy',
-          name: 'Octopus Dynamic & Green Gas',
-          badge: '⚡ Beste HEMS Integratie',
-          badge_color: 'cyan',
-          type: 'Dynamisch',
-          formula_elec: 'EPEX Spot + 0,15 c€/kWh + €45 vast',
-          formula_gas: 'TTF spot index + €35 vast (€0,86/m³)',
-          inj_rate_c_kwh: 5.20,
-          fixed_fee_annual_eur: 80,
-          elec_cost_eur: 1226,
-          gas_cost_eur: 1110,
-          inj_credit_eur: 213.20,
-          net_annual_total_eur: 2122.80,
-          delta_vs_current_eur: 441.48,
-          delta_pct: 17.2,
-          is_recommended: false,
-          action_status: 'Sterk Alternatief',
-          highlight: 'Bewezen marktleider in slimme dynamische HEMS sturing. Scherpe marge en hoge injectievergoeding (5,2 c€/kWh).'
-        },
-        {
-          id: 'engie_flow_promo',
-          provider: 'Engie',
-          name: 'Flow (Mijnenergie Welkomstpromo)',
-          badge: '🎁 Hoogste 1e-Jaars Promo',
-          badge_color: 'purple',
-          type: 'Variabel (Promo-Hop)',
-          formula_elec: 'Standaard Flow min €195 welkomstkorting',
-          formula_gas: 'Standaard Flow min €145 gaskorting',
-          inj_rate_c_kwh: 4.50,
-          fixed_fee_annual_eur: 120,
-          elec_cost_eur: 1095,
-          gas_cost_eur: 965,
-          inj_credit_eur: 184.50,
-          net_annual_total_eur: 1875.50,
-          delta_vs_current_eur: 688.78,
-          delta_pct: 26.9,
-          is_recommended: false,
-          action_status: 'Promo-Hop Strategie',
-          highlight: 'Maximale welkomstbonus (-€340 in jaar 1). Vereist wel dat de CFO na 11 maanden opnieuw overstapt om de sprong naar standaardtarief te vermijden.'
-        },
-        {
-          id: 'totalenergies_pixel',
-          provider: 'TotalEnergies',
-          name: 'Pixel Blue & Gas',
-          badge: '⚖️ Gemiddelde Markt',
-          badge_color: 'blue',
-          type: 'Variabel (3-Maandelijks)',
-          formula_elec: 'Endex kwartaalindex + €65 vast',
-          formula_gas: 'TTF kwartaal + €60 vast',
-          inj_rate_c_kwh: 4.20,
-          fixed_fee_annual_eur: 125,
-          elec_cost_eur: 1246,
-          gas_cost_eur: 1150,
-          inj_credit_eur: 172.20,
-          net_annual_total_eur: 2223.80,
-          delta_vs_current_eur: 340.48,
-          delta_pct: 13.3,
-          is_recommended: false,
-          action_status: 'Stabiele Middenmoot',
-          highlight: 'Driemaandelijkse prijsbescherming. Goede service, maar lagere injectievergoeding dan Ecopower.'
-        },
-        {
-          id: 'luminus_comfyflex',
-          provider: 'Luminus',
-          name: 'ComfyFlex',
-          badge: '🏛️ Grote Speler',
-          badge_color: 'amber',
-          type: 'Variabel',
-          formula_elec: 'Indexering maandelijks + €70 vast',
-          formula_gas: 'Indexering maandelijks + €65 vast',
-          inj_rate_c_kwh: 4.00,
-          fixed_fee_annual_eur: 135,
-          elec_cost_eur: 1286,
-          gas_cost_eur: 1170,
-          inj_credit_eur: 164.00,
-          net_annual_total_eur: 2292.00,
-          delta_vs_current_eur: 272.28,
-          delta_pct: 10.6,
-          is_recommended: false,
-          action_status: 'Minder Gunstig',
-          highlight: 'Grootste marktaandeel in Vlaanderen, maar relatief hoge vaste kosten en magere injectie.'
-        },
-        {
-          id: 'engie_easy_vast',
-          provider: 'Engie / Luminus',
-          name: '1-Jaar Vast Tarief (Winterzekerheid)',
-          badge: '🛡️ Risicodekking (Vast)',
-          badge_color: 'rose',
-          type: '100% Vast (12 Mnd)',
-          formula_elec: 'Vaste kWh-prijs 37,5 c€ all-in',
-          formula_gas: 'Vaste gasprijs 10,2 c€/kWh (€1,05/m³)',
-          inj_rate_c_kwh: 3.50,
-          fixed_fee_annual_eur: 150,
-          elec_cost_eur: 1580,
-          gas_cost_eur: 1380,
-          inj_credit_eur: 143.50,
-          net_annual_total_eur: 2816.50,
-          delta_vs_current_eur: -252.22,
-          delta_pct: -9.8,
-          is_recommended: false,
-          action_status: 'Verzekeringspremie (-€252)',
-          highlight: 'Geen enkele blootstelling aan marktschokken. Kost momenteel €21/maand méér dan Mega Dynamisch (fungeert puur als verzekeringspremie tegen geopolitieke escalaties).'
+          highlight: 'Huidige baseline bij Mega. Lage afnamemarge, maar erg lage injectievergoeding (slechts 2,92 c€) en geen welkomstbonussen.'
         }
-      ],
-      switch_strategy: {
-        recommended_action: 'Switch Stroom naar Ecopower + Gas naar Promo-Contract of Dats 24',
-        annual_net_benefit_eur: 562.78,
-        monthly_net_benefit_eur: 46.90,
-        triggers: [
-          {
-            season: 'Voorjaar / Zomer (Maart - Oktober)',
-            title: 'De Zonne-Injectie Hefboom',
-            description: 'Met 4.100 kWh jaarlijkse zonne-injectie is de injectievergoeding jouw grootste rendementshefboom. Bij Mega krijg je 2,92 c€/kWh (€120). Bij Ecopower krijg je 6,50 c€/kWh (€266,50). Dat is €146,50 pure cashwinst zonder enige gedragswijziging.',
-            urgency: 'Hoog voor zonnestroomseizoen'
-          },
-          {
-            season: 'Winter (November - Februari)',
-            title: 'Aardgas Winteroptimalisatie',
-            description: '80% van het gasverbruik valt in deze 5 maanden. Huidig tarief bij Mega is €0,93/m³. Een switch naar Dats 24 (€0,86/m³) levert €118/jr op, maar een welkomstbonus-contract (Engie Flow Promo) levert zelfs €241/jr op!',
-            urgency: 'Direct toepasbaar'
-          },
-          {
-            season: 'Doorlopend',
-            title: 'De Welkomstpromo Drempel (€150)',
-            description: 'Stap enkel over naar traditionele partijen (Engie/Luminus) indien de netto welkomstbonus na aftrek van vaste kosten minimaal €150 bedraagt, om administratieve overhead te rechtvaardigen.',
-            urgency: 'Optioneel voor actieve hoppers'
-          },
-          {
-            season: 'Marktrisico',
-            title: 'Wanneer overstappen naar een Vast Tarief?',
-            description: 'Overweeg pas een vast tarief indien de TTF gas future structureel boven €50/MWh uitstijgt of de geopolitieke winterpremie > 30% wordt. Op dit moment betaal je voor een vast contract een overpremie van €252/jaar.',
-            urgency: 'Monitoring'
-          }
-        ]
-      },
-
-      // 6. DEDICATED CFO DECISION BOARD DATA (Gas Promo vs Dats 24 & Roadmap)
-      decision_board: {
-        gas_head_to_head: {
-          profile_volume_m3: 1250,
-          winter_volume_m3: 1000,
-          current_mega: {
-            provider: 'Mega Smart Gas',
-            unit_price_m3: 0.93,
-            fixed_fee_eur: 65,
-            annual_cost_eur: 1228,
-            winter_cost_eur: 980,
-            promo_discount_eur: 0,
-            badge: 'Huidige Baseline',
-            badge_color: 'slate',
-            status: 'Verlieslatend (-€241 te veel)'
-          },
-          dats_standard: {
-            provider: 'Dats 24 / Energie.be Gas',
-            unit_price_m3: 0.86,
-            fixed_fee_eur: 35,
-            annual_cost_eur: 1110,
-            winter_cost_eur: 885,
-            promo_discount_eur: 0,
-            saving_vs_mega_eur: 118,
-            badge: 'Fair Price (Geen Promo)',
-            badge_color: 'blue',
-            status: 'Stabiel (Geen omkijken naar)',
-            cfo_evaluation: 'Eerlijke marktprijs zonder tijdelijke lokvogels. Bespaart €118/jr vs Mega zonder dat je ooit opnieuw hoeft over te stappen.'
-          },
-          promo_hopper: {
-            provider: 'Engie Flow / Luminus Gas (Welkomstpromo)',
-            unit_price_m3: 0.87,
-            fixed_fee_eur: 55,
-            annual_cost_eur: 987,
-            winter_cost_eur: 785,
-            promo_discount_eur: 155,
-            saving_vs_mega_eur: 241,
-            extra_vs_dats_eur: 123,
-            badge: '🏆 #1 Hoogste Rendement (Aanbevolen)',
-            badge_color: 'emerald',
-            status: 'Aanbevolen voor CFO (Max Cash)',
-            cfo_evaluation: 'Absoluut superieur in Jaar 1! De welkomstbonus van €155 levert €123 méér netto cashflow op dan Dats 24. Vereist wel dat je in maand 11 even opnieuw overstapt.'
-          }
-        },
-        roadmap_milestones: [
-          {
-            step: 1,
-            phase: 'ACTIE NU',
-            timing: 'Vóór 10 November 2026',
-            action: 'Switch Aardgas naar Promo-Contract (Engie Flow / Mijnenergie eDeals)',
-            target_start: '1 December 2026',
-            expected_gain: '+€241,- Netto Winst (waarvan €155 eenmalige welkomstbonus)',
-            details: 'Vangt direct 85% van het winterstookseizoen af aan de laagste jaarkost (€987 ipv €1.228).',
-            urgency: 'Dringend'
-          },
-          {
-            step: 2,
-            phase: 'ACTIE VOORJAAR',
-            timing: '15 Februari 2027',
-            action: 'Switch Elektriciteit naar Ecopower (Burgercoöperatie)',
-            target_start: '1 Maart 2027',
-            expected_gain: '+€222,- Zonne-Arbitrage Winst (6,50 c€ injectie + €0 vast recht)',
-            details: 'Start exact gelijk met de zonnepiek. 4.100 kWh injectie brengt €266,50 op in plaats van €120 bij Mega.',
-            urgency: 'Gepland'
-          },
-          {
-            step: 3,
-            phase: 'HEMS RUNTIME',
-            timing: 'Doorlopend 2026 - 2027',
-            action: 'HEMS Dyn-Arbitrage & Pre-heat Sturing',
-            target_start: 'Actief',
-            expected_gain: '+€180 tot €250 Vermeden Prijspieken & Gasvervanging',
-            details: 'Daikin lucht/lucht warmtepompen vangen dagpieken op; Daalderop ketel bewaakt nachtbasis (19,5°C) zonder overdrukrisico.',
-            urgency: 'Actief'
-          },
-          {
-            step: 4,
-            phase: 'JAARLIJKSE AUDIT',
-            timing: 'Oktober 2027 (Maand 11)',
-            action: 'Promo-Hop Check & Vernieuwing',
-            target_start: '1 December 2027',
-            expected_gain: 'Voorkomt terugval naar standaardtarief, herhaalt welkomstbonus',
-            details: 'Vóór afloop van de 12-maanden welkomstkorting opnieuw vergelijken en eventueel doorrollen naar Dats 24 of nieuwe actuele promo.',
-            urgency: 'Kalenderherinnering'
-          }
-        ],
-        combined_roi: {
-          total_annual_gain_eur: 463, // €241 gas promo + €222 stroom ecopower
-          hourly_wage_switch: 2778, // 10 minutes work total = €463 * 6 = €2778/hr
-          action_link_vreg: 'https://vtest.vreg.be/',
-          action_link_mijnenergie: 'https://www.mijnenergie.be/'
-        }
-      }
+      ]
     };
 
     return NextResponse.json({
