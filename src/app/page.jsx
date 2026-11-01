@@ -146,7 +146,7 @@ export default function CFODashboard() {
   const decisionBoard = market?.decision_board;
   const gasHead = decisionBoard?.gas_head_to_head;
   const mijnenergieAudit = market?.mijnenergie_audit;
-  const fluvius = mijnenergieAudit?.fluvius_profile;
+  const fluvius = market?.profile;
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 pb-16">
