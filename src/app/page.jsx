@@ -456,16 +456,132 @@ export default function CFODashboard() {
               </div>
             </div>
 
+            {/* November 2026 Marktverschuivingen & Gewogen Advieskader */}
+            <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 p-6 sm:p-7 shadow-xl space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                    <Sliders className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-bold text-white">
+                        November 2026 Marktupdate & Gewogen CFO Advies
+                      </h3>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                        Multi-Factor Scoring
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Wat is er gewijzigd in november 2026? Wet Koopkracht Energie, accijnsverlaging stroom & Dats 24 exit gewogen.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs text-slate-300 bg-slate-800 px-3 py-1 rounded-lg border border-slate-700 font-mono">
+                  Gevalideerd: 2 November 2026
+                </span>
+              </div>
+
+              {/* 3 Belangrijke November Verschuivingen */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">1. Wetgeving (1 Nov 2026)</span>
+                  <h4 className="text-sm font-bold text-white">Bijzondere Accijnzen Elektriciteit Omlaag</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Federale accijns op stroom is gedaald van €46 naar <strong>€42,20 per MWh</strong> (-0,38 c€/kWh). Dit maakt verwarmen via jouw Daikin warmtepompen overdag structureel nóg voordeliger t.o.v. de gasketel.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">2. Transparantie</span>
+                  <h4 className="text-sm font-bold text-white">Wet Koopkracht Energie van Kracht</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Vergelijkers en leveranciers mogen voorwaardelijke welkomstkortingen niet meer verrekenen in de standaard jaarprijs. Rangschikkingen moeten nu de échte basistarieven en vaste rechten tonen.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">3. Marktdynamiek</span>
+                  <h4 className="text-sm font-bold text-white">Dats 24 Exit & Focus op Energie.be</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Dats 24 heeft de particuliere energielevering per 31/08 stopgezet en overgedragen aan EnergyVision. Voor eerlijke contracten zonder lokkorting is <strong>Energie.be</strong> (vast recht €35) nu de marktreferentie.
+                  </p>
+                </div>
+              </div>
+
+              {/* Gewogen Advies Matrix (3 Gewogen Profielen) */}
+              <div className="space-y-3 pt-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                  Gewogen Strategieën (Besparing 40% · Gemoedsrust 35% · Winterzekerheid 25%)
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Profiel 1: CFO Arbitrage */}
+                  <div className="p-5 rounded-xl bg-gradient-to-b from-emerald-950/40 to-slate-950 border-2 border-emerald-500/80 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500 text-slate-950">
+                        Top Gewogen Score: 8.6 / 10
+                      </span>
+                      <span className="text-xs text-emerald-400 font-bold">€2.622/jr</span>
+                    </div>
+                    <h5 className="text-sm font-bold text-white">Strategie A: De CFO Arbitrage Hopper</h5>
+                    <div className="text-xs text-slate-300 space-y-1 font-mono">
+                      <div>⚡ Stroom: <strong>Ecopower</strong> (€0 vast recht)</div>
+                      <div>🔥 Gas: <strong>Engie Easy Fixed Promo</strong> (-€441)</div>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      <strong>Gewogen oordeel:</strong> Hoogste netto rendement in Jaar 1 (+€374 vs Mega). Vereist echter één switch na 11 maanden conform de regels van de Wet Koopkracht Energie.
+                    </p>
+                  </div>
+
+                  {/* Profiel 2: No-Hassle Transparant */}
+                  <div className="p-5 rounded-xl bg-slate-950 border border-slate-700 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                        Gewogen Score: 8.45 / 10
+                      </span>
+                      <span className="text-xs text-blue-300 font-bold">€2.720/jr</span>
+                    </div>
+                    <h5 className="text-sm font-bold text-white">Strategie B: "Geen Gedoe" No-Hassle</h5>
+                    <div className="text-xs text-slate-300 space-y-1 font-mono">
+                      <div>⚡ Stroom: <strong>Ecopower</strong> (€0 vast recht)</div>
+                      <div>🔥 Gas: <strong>Energie.be Gas Variabel</strong> (€35 vast recht)</div>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      <strong>Gewogen oordeel:</strong> Maximale gemoedsrust. Nul voorwaardelijke welkomstvallen, structureel de laagste vaste kosten. Nooit meer verplicht hoeven hoppen.
+                    </p>
+                  </div>
+
+                  {/* Profiel 3: Commerciële Valkuil */}
+                  <div className="p-5 rounded-xl bg-slate-950 border border-red-900/40 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30">
+                        Gewogen Score: 5.1 / 10
+                      </span>
+                      <span className="text-xs text-rose-300 font-bold">€2.860/jr (Jaar 1)</span>
+                    </div>
+                    <h5 className="text-sm font-bold text-white">Strategie C: Mijnenergie Dual Fuel Combi</h5>
+                    <div className="text-xs text-slate-300 space-y-1 font-mono">
+                      <div>⚡ Stroom: <strong>Luminus ComfyFlex</strong></div>
+                      <div>🔥 Gas: <strong>Luminus ComfyFlex Gas</strong></div>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      <strong>Gewogen oordeel:</strong> Ontmaskerd door de Wet Koopkracht Energie. Bruto kost is €3.819/jr. Na 12 maanden vervalt de bonus en betaal je de hoofdprijs.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Head-to-Head Gas Comparison Cards */}
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
                     <Flame className="w-5 h-5 text-orange-400" />
-                    Aardgas Head-to-Head: Mega (Huidig) vs. Dats 24 vs. Welkomstpromo
+                    Aardgas Head-to-Head: Mega (Huidig) vs. Energie.be (Fair Price) vs. Welkomstpromo
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Exact berekend op 1.250 m³ gas/jaar (Duffel) inclusief nettarieven en btw
+                    Exact berekend op 1.267 m³ gas/jaar (14.316 kWh Duffel) inclusief nettarieven en btw
                   </p>
                 </div>
                 <span className="text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700">
@@ -498,14 +614,14 @@ export default function CFODashboard() {
                   </div>
                 </div>
 
-                {/* 2. Dats 24 (Fair Price) */}
+                {/* 2. Energie.be (Fair Price) */}
                 <div className="rounded-2xl bg-slate-900/80 border border-slate-700 p-6 flex flex-col justify-between shadow-lg relative">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold uppercase tracking-wider text-blue-400">Optie A: Fair Price</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Zonder Promo</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">Wet Koopkracht</span>
                     </div>
-                    <h4 className="text-lg font-bold text-white">Dats 24 / Energie.be</h4>
+                    <h4 className="text-lg font-bold text-white">Energie.be Gas Variabel</h4>
                     <div className="text-3xl font-black text-blue-300">
                       €{gasHead?.dats_standard?.annual_cost_eur || 1110} <span className="text-xs font-normal text-slate-400">/ jaar</span>
                     </div>
@@ -513,7 +629,7 @@ export default function CFODashboard() {
                       <div className="flex justify-between"><span>Tarief per m³:</span><strong className="text-slate-200">€0,86 / m³</strong></div>
                       <div className="flex justify-between"><span>Vast Recht:</span><strong className="text-slate-200">€35 / jaar</strong></div>
                       <div className="flex justify-between"><span>Winterkost (Nov-Mrt):</span><strong className="text-blue-300">€885</strong></div>
-                      <div className="flex justify-between"><span>Welkomstbonus:</span><span className="text-slate-500">Geen</span></div>
+                      <div className="flex justify-between"><span>Welkomstbonus:</span><span className="text-slate-500">Geen (Structureel)</span></div>
                     </div>
                   </div>
                   <div className="mt-5 pt-3 border-t border-slate-800 space-y-2">
@@ -522,7 +638,7 @@ export default function CFODashboard() {
                       <span>+€{gasHead?.dats_standard?.annual_saving_eur || 118} / jr</span>
                     </div>
                     <p className="text-[11px] text-slate-400 leading-tight">
-                      Ideaal voor wie <em>nooit</em> meer wil omkijken en geen kalenderherinnering wil zetten.
+                      Structureel eerlijke tarieven zonder lokvogels. <em>(Noot: Dats 24 is per 31/08/2026 gestopt en overgedragen aan EnergyVision)</em>.
                     </p>
                   </div>
                 </div>
@@ -539,14 +655,14 @@ export default function CFODashboard() {
                         1e Jaars Promo
                       </span>
                     </div>
-                    <h4 className="text-lg font-bold text-white">Engie Flow / Luminus Gas</h4>
+                    <h4 className="text-lg font-bold text-white">Engie Easy Fixed Gas Promo</h4>
                     <div className="text-3xl font-black text-emerald-400">
                       €{gasHead?.promo_hopper?.annual_cost_eur || 987} <span className="text-xs font-normal text-slate-400">/ jaar</span>
                     </div>
                     <div className="space-y-1.5 text-xs text-slate-400 pt-2 border-t border-slate-800">
                       <div className="flex justify-between"><span>Tarief per m³:</span><strong className="text-slate-200">€0,87 / m³</strong></div>
                       <div className="flex justify-between"><span>Vast Recht:</span><strong className="text-slate-200">€55 / jaar</strong></div>
-                      <div className="flex justify-between"><span>Welkomstbonus:</span><strong className="text-emerald-400 font-bold">-€155 eenmalig</strong></div>
+                      <div className="flex justify-between"><span>Welkomstbonus:</span><strong className="text-emerald-400 font-bold">-€441 eenmalig</strong></div>
                       <div className="flex justify-between"><span>Winterkost (Nov-Mrt):</span><strong className="text-emerald-300 font-bold">€785</strong></div>
                     </div>
                   </div>
@@ -556,7 +672,7 @@ export default function CFODashboard() {
                       <span>+€{gasHead?.promo_hopper?.saving_vs_mega_eur || 241} / jr</span>
                     </div>
                     <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 font-semibold">
-                      💡 Levert <strong>€123 méér netto cash</strong> op dan Dats 24! Vereist na 11 maanden één nieuwe switch.
+                      💡 Levert <strong>€123 méér netto cash</strong> op dan Energie.be! Vereist na 11 maanden één nieuwe switch.
                     </div>
                   </div>
                 </div>
