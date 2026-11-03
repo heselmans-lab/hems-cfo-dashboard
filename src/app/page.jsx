@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
 import { 
   TrendingUp, 
   TrendingDown,
@@ -28,7 +29,8 @@ import {
   CheckSquare,
   Gift,
   Target,
-  FileText
+  FileText,
+  HeartHandshake
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -255,6 +257,15 @@ export default function CFODashboard() {
             <Flame className="w-4 h-4" />
             Seizoensgraaddagen (HDD)
           </button>
+
+          <Link
+            href="/advies"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 sm:ml-auto"
+            title="Eenvoudige adviseur voor familie en senioren"
+          >
+            <HeartHandshake className="w-4 h-4 text-amber-400" />
+            Eenvoudig Advies (Familie & 88+)
+          </Link>
         </div>
       </header>
 
