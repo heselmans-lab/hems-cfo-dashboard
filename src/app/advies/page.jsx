@@ -45,6 +45,7 @@ export default function EenvoudigAdviesPage() {
   // Exacte kWh (indien van factuur afgelezen)
   const [kwhElec, setKwhElec] = useState(1600);
   const [kwhGas, setKwhGas] = useState(6500);
+  const [kwhSolar, setKwhSolar] = useState(1800); // Teruglevering / injectie van zonnepanelen in kWh/jaar
 
   // Text size classes
   const fontClass = useMemo(() => {
@@ -61,40 +62,48 @@ export default function EenvoudigAdviesPage() {
     if (inputMode === 'average') {
       const elec = housingType === 'appartement' ? 1500 : 3200;
       const gas = hasGas ? (housingType === 'appartement' ? 5500 : 14000) : 0;
-      return { elec, gas };
+      const solarInjection = hasSolar ? (housingType === 'appartement' ? 1200 : 2000) : 0;
+      return { elec, gas, solarInjection };
     }
     if (inputMode === 'monthly') {
       // Slapend legacy contract hanteert vaak ~€0,38/kWh all-in stroom en ~€0,11/kWh gas
       const elec = Math.round((monthlyElec * 12) / 0.38);
       const gas = hasGas ? Math.round((monthlyGas * 12) / 0.11) : 0;
-      return { elec, gas };
+      const solarInjection = hasSolar ? (Number(kwhSolar) || 1800) : 0;
+      return { elec, gas, solarInjection };
     }
     // 'kwh'
     return {
       elec: Number(kwhElec) || 1600,
-      gas: hasGas ? (Number(kwhGas) || 6000) : 0
+      gas: hasGas ? (Number(kwhGas) || 6000) : 0,
+      solarInjection: hasSolar ? (Number(kwhSolar) || 1800) : 0
     };
-  }, [inputMode, housingType, hasGas, monthlyElec, monthlyGas, kwhElec, kwhGas]);
+  }, [inputMode, housingType, hasGas, hasSolar, monthlyElec, monthlyGas, kwhElec, kwhGas, kwhSolar]);
 
   // Berekening huidige kosten vs nieuwe kosten
   const financialResult = useMemo(() => {
-    const { elec, gas } = effectiveUsage;
+    const { elec, gas, solarInjection } = effectiveUsage;
 
     // 1. Huidige situatie (Slapend/Legacy contract zoals Luminus Basic of Engie Classic)
-    // Vaak hoge vaste vergoeding (€ 65 - 85/jr) + hoge kWh prijs
-    const currentElecCost = Math.round(75 + (elec * 0.355));
+    // Vaak hoge vaste vergoeding (€ 65 - 85/jr) + hoge kWh prijs, minimale injectievergoeding (~2,5 c€/kWh)
+    const currentSolarYield = hasSolar ? Math.round(solarInjection * 0.025) : 0;
+    const currentElecGross = Math.round(75 + (elec * 0.355));
+    const currentElecCost = Math.max(0, currentElecGross - currentSolarYield);
     const currentGasCost = gas > 0 ? Math.round(65 + (gas * 0.108)) : 0;
     const currentTotalYear = currentElecCost + currentGasCost;
 
     // 2. Nieuwe beste situatie (100% Vaste prijs met maximale welkomstkorting)
     // Gas: Engie Easy Fixed promo (-€432 eDeal korting) -> netto zeer scherp
-    // Stroom: Ecopower (€0 vast recht) of Engie Flow met welkomstkorting
+    // Stroom: Ecopower (€0 vast recht) met ~6,5 c€/kWh injectievergoeding, of Engie Flow met welkomstkorting
     let newElecCost = 0;
     let newGasCost = 0;
+    let newSolarYield = 0;
 
     if (hasSolar) {
-      // Ecopower: €0 vast recht, top injectie
-      newElecCost = Math.round(0 + (elec * 0.285));
+      // Ecopower: €0 vast recht, top injectie (€0.065/kWh)
+      newSolarYield = Math.round(solarInjection * 0.065);
+      const newElecGross = Math.round(0 + (elec * 0.285));
+      newElecCost = Math.max(30, newElecGross - newSolarYield);
     } else {
       // Engie / Total met welkomstpromo van ~€140-180
       newElecCost = Math.max(250, Math.round(55 + (elec * 0.295) - 150));
@@ -109,6 +118,7 @@ export default function EenvoudigAdviesPage() {
     const newTotalYear = newElecCost + newGasCost;
     const yearlySavings = Math.max(120, currentTotalYear - newTotalYear);
     const monthlySavings = Math.round(yearlySavings / 12);
+    const solarExtraYield = Math.max(0, newSolarYield - currentSolarYield);
 
     return {
       currentTotalYear,
@@ -119,6 +129,9 @@ export default function EenvoudigAdviesPage() {
       currentGasCost,
       newElecCost,
       newGasCost,
+      currentSolarYield,
+      newSolarYield,
+      solarExtraYield,
       recommendedGas: 'ENGIE Easy Fixed (12 maanden vast tarief)',
       recommendedGasDiscount: gas < 8000 ? '€ 220' : '€ 432',
       recommendedElec: hasSolar ? 'Ecopower Groene Burgerstroom' : 'ENGIE Easy of TotalEnergies (met welkomstkorting)'
@@ -131,11 +144,11 @@ export default function EenvoudigAdviesPage() {
     
 💰 Besparing: ongeveer € ${financialResult.yearlySavings} per jaar (€ ${financialResult.monthlySavings}/maand minder!).
 🔥 Aanrader Gas: ${financialResult.recommendedGas} (100% vaste prijs voor 1 jaar).
-⚡ Aanrader Elektriciteit: ${financialResult.recommendedElec}.
+⚡ Aanrader Elektriciteit: ${financialResult.recommendedElec}.${hasSolar ? `\n☀️ Zonnepanelen injectie: € ${financialResult.newSolarYield} per jaar opbrengst!` : ''}
 
 Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatste factuur nodig voor het EAN-nummer.`;
     return `https://wa.me/?text=${encodeURIComponent(text)}`;
-  }, [financialResult, housingType]);
+  }, [financialResult, housingType, hasSolar]);
 
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
@@ -455,7 +468,7 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
               <div className="bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 sm:p-8 mb-8 space-y-6">
                 <div>
                   <label htmlFor="input-kwh-elec" className={`font-bold text-slate-900 block mb-2 ${fontClass.xl}`}>
-                    ⚡ Elektriciteitsverbruik op jaarafrekening:
+                    {hasSolar ? '⚡ Elektriciteit die je van het net haalt (afname):' : '⚡ Elektriciteitsverbruik op jaarafrekening:'}
                   </label>
                   <div className="flex items-center gap-4">
                     <input
@@ -474,6 +487,33 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
                     ✓ Komt bij een slapend tarief overeen met ongeveer <strong>€ {Math.round((kwhElec * 0.355 + 75) / 12)} / maand</strong>
                   </div>
                 </div>
+
+                {hasSolar && (
+                  <div>
+                    <label htmlFor="input-kwh-solar" className={`font-bold text-slate-900 block mb-2 ${fontClass.xl}`}>
+                      ☀️ Zonnepanelen stroom die je teruglevert aan het net (injectie):
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        id="input-kwh-solar"
+                        type="number"
+                        min="0"
+                        max="15000"
+                        step="100"
+                        value={kwhSolar}
+                        onChange={(e) => setKwhSolar(Number(e.target.value))}
+                        className={`w-44 p-4 font-black border-4 border-amber-300 rounded-2xl text-center focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-200 ${fontClass['2xl']}`}
+                      />
+                      <span className={`text-slate-600 font-bold ${fontClass.lg}`}>kWh per jaar</span>
+                    </div>
+                    <div className="text-sm font-bold text-amber-900 bg-amber-100/90 px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 mt-3">
+                      ☀️ Levert bij Ecopower direct <strong>€ {Math.round((kwhSolar || 1800) * 0.065)} / jaar</strong> injectievergoeding op!
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Tip: Dit staat op je jaarafrekening vermeld als "Geïnjecteerde elektriciteit" of "Injectie".
+                    </p>
+                  </div>
+                )}
 
                 {hasGas && (
                   <div>
@@ -522,9 +562,33 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
                     <span className={`text-slate-600 font-bold ${fontClass.lg}`}>per maand</span>
                   </div>
                   <div className="text-sm font-bold text-emerald-800 bg-emerald-100/80 px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 mt-3">
-                    👉 Komt overeen met ongeveer <strong>{effectiveUsage.elec.toLocaleString('nl-BE')} kWh</strong> elektriciteit per jaar
+                    👉 Komt overeen met ongeveer <strong>{effectiveUsage.elec.toLocaleString('nl-BE')} kWh</strong> afname van het net per jaar
                   </div>
                 </div>
+
+                {hasSolar && (
+                  <div>
+                    <label htmlFor="input-monthly-solar" className={`font-bold text-slate-900 block mb-2 ${fontClass.xl}`}>
+                      ☀️ Geschatte zonnestroom teruggeleverd aan het net (injectie):
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        id="input-monthly-solar"
+                        type="number"
+                        min="0"
+                        max="15000"
+                        step="100"
+                        value={kwhSolar}
+                        onChange={(e) => setKwhSolar(Number(e.target.value))}
+                        className={`w-44 p-4 font-black border-4 border-amber-300 rounded-2xl text-center focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-200 ${fontClass['2xl']}`}
+                      />
+                      <span className={`text-slate-600 font-bold ${fontClass.lg}`}>kWh per jaar</span>
+                    </div>
+                    <div className="text-sm font-bold text-amber-900 bg-amber-100/90 px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 mt-3">
+                      👉 Levert bij Ecopower direct <strong>€ {Math.round((kwhSolar || 1800) * 0.065)} / jaar</strong> injectievergoeding op
+                    </div>
+                  </div>
+                )}
 
                 {hasGas && (
                   <div>
@@ -560,8 +624,13 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
                 </p>
                 <div className="flex flex-wrap gap-3 pt-1">
                   <span className="bg-white border border-emerald-300 text-emerald-800 px-3.5 py-1.5 rounded-xl font-bold">
-                    ⚡ <strong>{effectiveUsage.elec.toLocaleString('nl-BE')} kWh</strong> elektriciteit/jaar
+                    ⚡ <strong>{effectiveUsage.elec.toLocaleString('nl-BE')} kWh</strong> stroomafname/jaar
                   </span>
+                  {hasSolar && (
+                    <span className="bg-white border border-amber-300 text-amber-800 px-3.5 py-1.5 rounded-xl font-bold">
+                      ☀️ <strong>{effectiveUsage.solarInjection.toLocaleString('nl-BE')} kWh</strong> zonnestroom injectie/jaar
+                    </span>
+                  )}
                   {hasGas && (
                     <span className="bg-white border border-amber-300 text-amber-800 px-3.5 py-1.5 rounded-xl font-bold">
                       🔥 <strong>{effectiveUsage.gas.toLocaleString('nl-BE')} kWh</strong> aardgas/jaar
@@ -641,30 +710,49 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
               <h3 className={`font-black text-slate-800 mb-4 flex items-center gap-2 ${fontClass.xl}`}>
                 📋 Berekend op basis van jouw verbruik:
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className={`grid grid-cols-1 ${hasSolar && hasGas ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-4`}>
                 <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-200 flex items-center gap-4">
                   <Zap className="w-10 h-10 text-emerald-600 shrink-0" />
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">Elektriciteitsverbruik</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">
+                      {hasSolar ? 'Stroom van het net (Afname)' : 'Elektriciteitsverbruik'}
+                    </span>
                     <strong className={`font-black text-slate-900 ${fontClass.xl}`}>
                       {effectiveUsage.elec.toLocaleString('nl-BE')} kWh / jaar
                     </strong>
                     <span className="text-xs text-slate-500 block mt-0.5">
-                      (Huidige kost: ~€ {Math.round(financialResult.currentElecCost / 12)}/mnd → Nieuw: ~€ {Math.round(financialResult.newElecCost / 12)}/mnd)
+                      (Nieuw geschat: ~€ {Math.round(financialResult.newElecCost / 12)}/mnd)
                     </span>
                   </div>
                 </div>
 
-                {hasGas && (
+                {hasSolar && (
                   <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-200 flex items-center gap-4">
-                    <Flame className="w-10 h-10 text-amber-600 shrink-0" />
+                    <Sun className="w-10 h-10 text-amber-500 shrink-0" />
                     <div>
-                      <span className="text-xs font-bold uppercase tracking-wider text-amber-800 block">Aardgasverbruik</span>
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-800 block">
+                        Zonnestroom Injectie
+                      </span>
+                      <strong className={`font-black text-slate-900 ${fontClass.xl}`}>
+                        {effectiveUsage.solarInjection.toLocaleString('nl-BE')} kWh / jaar
+                      </strong>
+                      <span className="text-xs text-emerald-700 font-bold block mt-0.5">
+                        (Ecopower vergoeding: +€ {financialResult.newSolarYield} / jaar!)
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {hasGas && (
+                  <div className="p-4 rounded-2xl bg-orange-50 border-2 border-orange-200 flex items-center gap-4">
+                    <Flame className="w-10 h-10 text-orange-600 shrink-0" />
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-orange-800 block">Aardgasverbruik</span>
                       <strong className={`font-black text-slate-900 ${fontClass.xl}`}>
                         {effectiveUsage.gas.toLocaleString('nl-BE')} kWh / jaar
                       </strong>
                       <span className="text-xs text-slate-500 block mt-0.5">
-                        (Huidige kost: ~€ {Math.round(financialResult.currentGasCost / 12)}/mnd → Nieuw: ~€ {Math.round(financialResult.newGasCost / 12)}/mnd)
+                        (Nieuw geschat: ~€ {Math.round(financialResult.newGasCost / 12)}/mnd)
                       </span>
                     </div>
                   </div>
@@ -718,7 +806,7 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
                   </div>
                   <p className={`text-slate-700 font-medium ${fontClass.base}`}>
                     {hasSolar 
-                      ? 'Geen jaarlijkse abonnementskost (€0 vast recht) én de hoogste vergoeding voor je zonnepanelen.' 
+                      ? `€0 vast recht (geen abonnementskost) én met ~6,5 c€/kWh de hoogste vergoeding voor jouw ${effectiveUsage.solarInjection.toLocaleString('nl-BE')} kWh geïnjecteerde zonnestroom (levert jou direct € ${financialResult.newSolarYield} per jaar op!).` 
                       : 'Blijvend scherpe prijs met welkomstkorting voor nieuwe klanten.'}
                   </p>
                 </div>
