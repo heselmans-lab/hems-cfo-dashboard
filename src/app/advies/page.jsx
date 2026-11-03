@@ -36,7 +36,7 @@ export default function EenvoudigAdviesPage() {
   const [hasSolar, setHasSolar] = useState(false); // zonnepanelen ja/nee
 
   const [currentSupplier, setCurrentSupplier] = useState('luminus'); // luminus | engie | total | mega | eneco | anders
-  const [inputMode, setInputMode] = useState('monthly'); // 'monthly' | 'kwh' | 'average'
+  const [inputMode, setInputMode] = useState('kwh'); // 'kwh' | 'monthly' | 'average'
   
   // Maandbedragen
   const [monthlyElec, setMonthlyElec] = useState(75);
@@ -415,13 +415,23 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
             {/* Hoe wil je verbruik invullen? */}
             <fieldset className="mb-8">
               <legend className={`font-bold text-slate-800 mb-4 block ${fontClass.xl}`}>
-                2. Hoe wil je jouw verbruik schatten?
+                2. Hoe wil je jouw verbruik invoeren?
               </legend>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
                   type="button"
+                  onClick={() => setInputMode('kwh')}
+                  className={`p-5 rounded-2xl border-4 text-left transition-all ${inputMode === 'kwh' ? 'border-emerald-600 bg-emerald-50 shadow-md ring-2 ring-emerald-300' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                  aria-pressed={inputMode === 'kwh'}
+                >
+                  <span className={`font-black block text-slate-900 ${fontClass.lg}`}>📑 Factuur (kWh)</span>
+                  <span className={`text-slate-600 block mt-1 ${fontClass.base}`}>"Ik vul het aantal kWh van de jaarafrekening in"</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setInputMode('monthly')}
-                  className={`p-5 rounded-2xl border-4 text-left transition-all ${inputMode === 'monthly' ? 'border-emerald-600 bg-emerald-50 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                  className={`p-5 rounded-2xl border-4 text-left transition-all ${inputMode === 'monthly' ? 'border-emerald-600 bg-emerald-50 shadow-md ring-2 ring-emerald-300' : 'border-slate-200 bg-white hover:border-slate-300'}`}
                   aria-pressed={inputMode === 'monthly'}
                 >
                   <span className={`font-black block text-slate-900 ${fontClass.lg}`}>💶 Mijn Maandbedrag</span>
@@ -431,26 +441,66 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
                 <button
                   type="button"
                   onClick={() => setInputMode('average')}
-                  className={`p-5 rounded-2xl border-4 text-left transition-all ${inputMode === 'average' ? 'border-emerald-600 bg-emerald-50 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                  className={`p-5 rounded-2xl border-4 text-left transition-all ${inputMode === 'average' ? 'border-emerald-600 bg-emerald-50 shadow-md ring-2 ring-emerald-300' : 'border-slate-200 bg-white hover:border-slate-300'}`}
                   aria-pressed={inputMode === 'average'}
                 >
                   <span className={`font-black block text-slate-900 ${fontClass.lg}`}>📊 Het Gemiddelde</span>
                   <span className={`text-slate-600 block mt-1 ${fontClass.base}`}>"Gebruik het gemiddelde voor mijn type woning"</span>
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => setInputMode('kwh')}
-                  className={`p-5 rounded-2xl border-4 text-left transition-all ${inputMode === 'kwh' ? 'border-emerald-600 bg-emerald-50 shadow-md' : 'border-slate-200 bg-white hover:border-slate-300'}`}
-                  aria-pressed={inputMode === 'kwh'}
-                >
-                  <span className={`font-black block text-slate-900 ${fontClass.lg}`}>📑 Exacte Factuur</span>
-                  <span className={`text-slate-600 block mt-1 ${fontClass.base}`}>"Ik vul het aantal kWh van de jaarafrekening in"</span>
-                </button>
               </div>
             </fieldset>
 
             {/* Invoervelden afhankelijk van modus */}
+            {inputMode === 'kwh' && (
+              <div className="bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 sm:p-8 mb-8 space-y-6">
+                <div>
+                  <label htmlFor="input-kwh-elec" className={`font-bold text-slate-900 block mb-2 ${fontClass.xl}`}>
+                    ⚡ Elektriciteitsverbruik op jaarafrekening:
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      id="input-kwh-elec"
+                      type="number"
+                      min="500"
+                      max="10000"
+                      step="50"
+                      value={kwhElec}
+                      onChange={(e) => setKwhElec(Number(e.target.value))}
+                      className={`w-44 p-4 font-black border-4 border-slate-300 rounded-2xl text-center focus:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200 ${fontClass['2xl']}`}
+                    />
+                    <span className={`text-slate-600 font-bold ${fontClass.lg}`}>kWh per jaar</span>
+                  </div>
+                  <div className="text-sm font-bold text-emerald-800 bg-emerald-100/80 px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 mt-3">
+                    ✓ Komt bij een slapend tarief overeen met ongeveer <strong>€ {Math.round((kwhElec * 0.355 + 75) / 12)} / maand</strong>
+                  </div>
+                </div>
+
+                {hasGas && (
+                  <div>
+                    <label htmlFor="input-kwh-gas" className={`font-bold text-slate-900 block mb-2 ${fontClass.xl}`}>
+                      🔥 Aardgasverbruik op jaarafrekening:
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        id="input-kwh-gas"
+                        type="number"
+                        min="1000"
+                        max="30000"
+                        step="100"
+                        value={kwhGas}
+                        onChange={(e) => setKwhGas(Number(e.target.value))}
+                        className={`w-44 p-4 font-black border-4 border-slate-300 rounded-2xl text-center focus:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200 ${fontClass['2xl']}`}
+                      />
+                      <span className={`text-slate-600 font-bold ${fontClass.lg}`}>kWh per jaar</span>
+                    </div>
+                    <div className="text-sm font-bold text-amber-800 bg-amber-100/80 px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 mt-3">
+                      ✓ Komt bij een slapend tarief overeen met ongeveer <strong>€ {Math.round((kwhGas * 0.108 + 65) / 12)} / maand</strong>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {inputMode === 'monthly' && (
               <div className="bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 sm:p-8 mb-8 space-y-6">
                 <div>
@@ -470,6 +520,9 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
                       className={`w-36 p-4 font-black border-4 border-slate-300 rounded-2xl text-center focus:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200 ${fontClass['2xl']}`}
                     />
                     <span className={`text-slate-600 font-bold ${fontClass.lg}`}>per maand</span>
+                  </div>
+                  <div className="text-sm font-bold text-emerald-800 bg-emerald-100/80 px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 mt-3">
+                    👉 Komt overeen met ongeveer <strong>{effectiveUsage.elec.toLocaleString('nl-BE')} kWh</strong> elektriciteit per jaar
                   </div>
                 </div>
 
@@ -492,49 +545,8 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
                       />
                       <span className={`text-slate-600 font-bold ${fontClass.lg}`}>per maand</span>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {inputMode === 'kwh' && (
-              <div className="bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 sm:p-8 mb-8 space-y-6">
-                <div>
-                  <label htmlFor="input-kwh-elec" className={`font-bold text-slate-900 block mb-2 ${fontClass.xl}`}>
-                    ⚡ Elektriciteitsverbruik op jaarafrekening:
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <input
-                      id="input-kwh-elec"
-                      type="number"
-                      min="500"
-                      max="10000"
-                      step="50"
-                      value={kwhElec}
-                      onChange={(e) => setKwhElec(Number(e.target.value))}
-                      className={`w-44 p-4 font-black border-4 border-slate-300 rounded-2xl text-center focus:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200 ${fontClass['2xl']}`}
-                    />
-                    <span className={`text-slate-600 font-bold ${fontClass.lg}`}>kWh per jaar</span>
-                  </div>
-                </div>
-
-                {hasGas && (
-                  <div>
-                    <label htmlFor="input-kwh-gas" className={`font-bold text-slate-900 block mb-2 ${fontClass.xl}`}>
-                      🔥 Aardgasverbruik op jaarafrekening:
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        id="input-kwh-gas"
-                        type="number"
-                        min="1000"
-                        max="30000"
-                        step="100"
-                        value={kwhGas}
-                        onChange={(e) => setKwhGas(Number(e.target.value))}
-                        className={`w-44 p-4 font-black border-4 border-slate-300 rounded-2xl text-center focus:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-200 ${fontClass['2xl']}`}
-                      />
-                      <span className={`text-slate-600 font-bold ${fontClass.lg}`}>kWh per jaar</span>
+                    <div className="text-sm font-bold text-amber-800 bg-amber-100/80 px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 mt-3">
+                      👉 Komt overeen met ongeveer <strong>{effectiveUsage.gas.toLocaleString('nl-BE')} kWh</strong> aardgas per jaar
                     </div>
                   </div>
                 )}
@@ -542,12 +554,20 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
             )}
 
             {inputMode === 'average' && (
-              <div className="bg-emerald-50 border-2 border-emerald-200 rounded-3xl p-6 mb-8">
-                <p className={`text-emerald-900 font-medium ${fontClass.lg}`}>
-                  ✓ Wij rekenen met het officiële Vlaamse VREG-gemiddelde voor een <strong>{housingType}</strong>: 
-                  <strong> {effectiveUsage.elec} kWh elektriciteit</strong>
-                  {hasGas ? ` en ${effectiveUsage.gas} kWh aardgas` : ''} per jaar.
+              <div className="bg-emerald-50 border-2 border-emerald-200 rounded-3xl p-6 mb-8 space-y-2">
+                <p className={`text-emerald-900 font-bold ${fontClass.lg}`}>
+                  ✓ Wij rekenen met het officiële Vlaamse VREG-gemiddelde voor een {housingType}:
                 </p>
+                <div className="flex flex-wrap gap-3 pt-1">
+                  <span className="bg-white border border-emerald-300 text-emerald-800 px-3.5 py-1.5 rounded-xl font-bold">
+                    ⚡ <strong>{effectiveUsage.elec.toLocaleString('nl-BE')} kWh</strong> elektriciteit/jaar
+                  </span>
+                  {hasGas && (
+                    <span className="bg-white border border-amber-300 text-amber-800 px-3.5 py-1.5 rounded-xl font-bold">
+                      🔥 <strong>{effectiveUsage.gas.toLocaleString('nl-BE')} kWh</strong> aardgas/jaar
+                    </span>
+                  )}
+                </div>
               </div>
             )}
 
@@ -613,6 +633,42 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
                     <span className={fontClass.base}><strong>Geen papierwerk:</strong> De nieuwe leverancier zegt je oude contract gratis op.</span>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Samenvatting van het berekende verbruik */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-md border-2 border-slate-200">
+              <h3 className={`font-black text-slate-800 mb-4 flex items-center gap-2 ${fontClass.xl}`}>
+                📋 Berekend op basis van jouw verbruik:
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-200 flex items-center gap-4">
+                  <Zap className="w-10 h-10 text-emerald-600 shrink-0" />
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 block">Elektriciteitsverbruik</span>
+                    <strong className={`font-black text-slate-900 ${fontClass.xl}`}>
+                      {effectiveUsage.elec.toLocaleString('nl-BE')} kWh / jaar
+                    </strong>
+                    <span className="text-xs text-slate-500 block mt-0.5">
+                      (Huidige kost: ~€ {Math.round(financialResult.currentElecCost / 12)}/mnd → Nieuw: ~€ {Math.round(financialResult.newElecCost / 12)}/mnd)
+                    </span>
+                  </div>
+                </div>
+
+                {hasGas && (
+                  <div className="p-4 rounded-2xl bg-amber-50 border-2 border-amber-200 flex items-center gap-4">
+                    <Flame className="w-10 h-10 text-amber-600 shrink-0" />
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-800 block">Aardgasverbruik</span>
+                      <strong className={`font-black text-slate-900 ${fontClass.xl}`}>
+                        {effectiveUsage.gas.toLocaleString('nl-BE')} kWh / jaar
+                      </strong>
+                      <span className="text-xs text-slate-500 block mt-0.5">
+                        (Huidige kost: ~€ {Math.round(financialResult.currentGasCost / 12)}/mnd → Nieuw: ~€ {Math.round(financialResult.newGasCost / 12)}/mnd)
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
