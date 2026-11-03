@@ -1,8 +1,8 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'HEMS CFO Analytics | Duffel',
-  description: 'Executive Smart Home Energy & Financial Analytics for Kristof & Karin',
+  title: 'HEMS Energy & Financial Analytics',
+  description: 'Smart Home Energy Management & Autonomous Financial Analytics',
   manifest: '/manifest.json',
 };
 

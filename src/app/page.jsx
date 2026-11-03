@@ -163,7 +163,7 @@ export default function CFODashboard() {
               <div className="flex items-center gap-2">
                 <h1 className="text-lg font-black tracking-tight text-white">HEMS Executive CFO Suite</h1>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  België / Duffel
+                  België / Vlaanderen
                 </span>
               </div>
               <p className="text-xs text-slate-400">
@@ -283,7 +283,7 @@ export default function CFODashboard() {
                 <div className="space-y-3 max-w-3xl">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     <Sparkles className="w-4 h-4 text-emerald-400" />
-                    CFO Executive Besluitvorming · Fluvius Duffel Audit
+                    CFO Executive Besluitvorming · Fluvius Meetdata Audit
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
                     HEMS Optimale Arbitrage: <span className="text-emerald-400">€2.622/jaar</span> verslaat Mijnenergie met €238/jaar!
@@ -323,7 +323,7 @@ export default function CFODashboard() {
                         Mijnenergie.be Reality Check & Audit
                       </h3>
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                        Fluvius Duffel Data Gekoppeld
+                        Fluvius Data Gekoppeld
                       </span>
                     </div>
                     <p className="text-xs text-slate-400">
@@ -333,7 +333,7 @@ export default function CFODashboard() {
                 </div>
                 <div className="text-xs text-slate-400 font-mono flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Kruisstraat 2570 Duffel</span>
+                  <span>Regio Vlaanderen (Fluvius)</span>
                 </div>
               </div>
 
@@ -383,7 +383,7 @@ export default function CFODashboard() {
               {/* The Head to Head Matrix Table */}
               <div className="rounded-xl border border-slate-800 overflow-hidden">
                 <div className="bg-slate-950/80 px-4 py-2.5 border-b border-slate-800 text-xs font-bold text-slate-300 flex justify-between items-center">
-                  <span>Reële Contract-Rangschikking voor Duffel (4.452 kWh Import · 4.863 kWh Injectie · 14.316 kWh Gas)</span>
+                  <span>Reële Contract-Rangschikking Vlaanderen (4.452 kWh Import · 4.863 kWh Injectie · 14.316 kWh Gas)</span>
                   <span className="text-[10px] text-slate-500 font-mono">Fluvius data</span>
                 </div>
                 <div className="overflow-x-auto">
@@ -592,7 +592,7 @@ export default function CFODashboard() {
                     Aardgas Head-to-Head: Mega (Huidig) vs. Energie.be (Fair Price) vs. Welkomstpromo
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Exact berekend op 1.267 m³ gas/jaar (14.316 kWh Duffel) inclusief nettarieven en btw
+                    Exact berekend op 1.267 m³ gas/jaar (14.316 kWh/jaar) inclusief nettarieven en btw
                   </p>
                 </div>
                 <span className="text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-lg border border-slate-700">
@@ -795,7 +795,7 @@ export default function CFODashboard() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-white font-bold text-sm">
                     <FileText className="w-4 h-4 text-indigo-400" />
-                    Duffel Fluvius Profiel (Officiële Meetdata)
+                    Fluvius Profiel (Officiële Meetdata)
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     Gekoppeld tot 01/11/2029
@@ -804,7 +804,7 @@ export default function CFODashboard() {
                 <div className="space-y-1 text-xs text-slate-300 font-mono pt-1">
                   <div className="flex justify-between border-b border-slate-800/80 py-1">
                     <span className="text-slate-400">Adres & Netbeheerder:</span>
-                    <strong>Kruisstraat, Duffel · Fluvius</strong>
+                    <strong>Vlaanderen · Fluvius</strong>
                   </div>
                   <div className="flex justify-between border-b border-slate-800/80 py-1">
                     <span className="text-slate-400">EAN Elektriciteit:</span>

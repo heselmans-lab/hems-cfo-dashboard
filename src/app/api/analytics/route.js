@@ -97,7 +97,7 @@ export async function GET(request) {
     const hourly = (hourlyRes.rows || []).reverse();
 
     // 5. Officially Calibrated Profile (Direct Fluvius Digital Meter Coupling 01/11/2026)
-    // Address: Kruisstraat, 2570 Duffel
+    // Address: Regio Vlaanderen
     // Stroom EAN: 541448860002535528 (4.452 kWh afname, 4.863 kWh injectie, 5,23 kW piek)
     // Gas EAN: 541448860003166066 (14.316 kWh / 1.267 m3 gas)
     const market = {
