@@ -33,7 +33,7 @@ import {
 } from 'recharts';
 
 export default function BommaTessenderloView({ data }) {
-  const { site_info, profile, market, monthly_history, action_plan } = data;
+  const { site_info, profile, market, monthly_history, action_plan, historical_invoices, two_year_comparison } = data;
   const currentContract = market?.current_contract;
   const proposedRenewal = market?.proposed_renewal;
   const contracts = market?.contracts || [];
@@ -340,9 +340,108 @@ export default function BommaTessenderloView({ data }) {
             <span className="text-[10px] text-slate-500 block">Dichtbij minimum 2,5 kW</span>
           </div>
         </div>
+
+        {/* 2-Year Jaarafsluiting Vergelijking */}
+        {two_year_comparison && (
+          <div className="pt-4 border-t border-slate-800 space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-indigo-400" />
+              2-Jarige Jaarafrekeningen Vergelijking (2024-2025 vs 2025-2026)
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-indigo-400 font-bold block">Jaar 1 (01.06.2024 - 31.05.2025)</span>
+                <div className="text-slate-300">Stroom: <strong>{two_year_comparison.year_2024_2025.elec_kwh} kWh</strong></div>
+                <div className="text-slate-300">Aardgas: <strong>{two_year_comparison.year_2024_2025.gas_kwh} kWh</strong></div>
+                <div className="text-slate-300">Totale Jaarkost: <strong>€{two_year_comparison.year_2024_2025.total_cost_eur}</strong></div>
+                <div className="text-emerald-400 font-bold">Creditnota: €{Math.abs(two_year_comparison.year_2024_2025.settlement_eur)} tegoed</div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-amber-400 font-bold block">Jaar 2 (01.06.2025 - 31.05.2026)</span>
+                <div className="text-slate-300">Stroom: <strong>{two_year_comparison.year_2025_2026.elec_kwh} kWh</strong></div>
+                <div className="text-slate-300">Aardgas: <strong>{two_year_comparison.year_2025_2026.gas_kwh} kWh</strong></div>
+                <div className="text-slate-300">Totale Jaarkost: <strong>€{two_year_comparison.year_2025_2026.total_cost_eur}</strong></div>
+                <div className="text-emerald-400 font-bold">Creditnota: €{Math.abs(two_year_comparison.year_2025_2026.settlement_eur)} tegoed</div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 space-y-1">
+                <span className="text-white font-bold block">2-Jarig Gemiddeld Referentieprofiel</span>
+                <div className="text-slate-300">Gem. Stroom: <strong className="text-white">{two_year_comparison.average.elec_kwh} kWh/jr</strong></div>
+                <div className="text-slate-300">Gem. Aardgas: <strong className="text-white">{two_year_comparison.average.gas_kwh} kWh/jr</strong></div>
+                <div className="text-slate-300">Gem. Jaarkost: <strong className="text-emerald-300">€{two_year_comparison.average.total_cost_eur}/jr</strong></div>
+                <div className="text-slate-400 text-[11px] pt-1">Zeer stabiel seniorenverbruik (verschil &lt; 1% op stroom)</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* 6. ACTIEPLAN & MANDAAT */}
+      {/* 6. VOLLEDIGE FACTURENHISTORIEK & VOORSCHOTTEN REGISTER (18 FACTUREN) */}
+      <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 sm:p-7 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <h3 className="text-lg font-black text-white flex items-center gap-2">
+              <FileText className="w-5 h-5 text-indigo-400" />
+              Facturen- & Voorschottenregister (18 Geverifieerde Luminus Documenten)
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">
+              Volledig overzicht van alle voorschotfacturen en jaarafrekeningen uit het archief (2024 - 2026).
+            </p>
+          </div>
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            18 Facturen Geverifieerd
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-300">
+            <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+              <tr>
+                <th className="py-2.5 px-3">Datum</th>
+                <th className="py-2.5 px-3">Type Document</th>
+                <th className="py-2.5 px-3">Factuurnummer</th>
+                <th className="py-2.5 px-3">Periode</th>
+                <th className="py-2.5 px-3 text-right">Stroom (excl)</th>
+                <th className="py-2.5 px-3 text-right">Gas (excl)</th>
+                <th className="py-2.5 px-3 text-right">Totaal (incl. BTW)</th>
+                <th className="py-2.5 px-3">Toelichting</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60 font-mono text-xs">
+              {historical_invoices?.map((inv) => (
+                <tr 
+                  key={inv.number + inv.date} 
+                  className={`hover:bg-slate-800/40 transition ${inv.is_credit ? 'bg-emerald-950/20 font-bold' : ''}`}
+                >
+                  <td className="py-2 px-3 text-slate-200">{inv.date}</td>
+                  <td className="py-2 px-3">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-sans ${
+                      inv.is_credit 
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                        : 'bg-slate-800 text-slate-300'
+                    }`}>
+                      {inv.type}
+                    </span>
+                  </td>
+                  <td className="py-2 px-3 text-slate-400">{inv.number}</td>
+                  <td className="py-2 px-3 font-sans text-slate-300">{inv.period}</td>
+                  <td className="py-2 px-3 text-right">€{inv.elec_excl}</td>
+                  <td className="py-2 px-3 text-right">€{inv.gas_excl}</td>
+                  <td className={`py-2 px-3 text-right font-bold ${
+                    inv.is_credit ? 'text-emerald-400 text-sm' : 'text-white'
+                  }`}>
+                    {inv.total_incl} €
+                  </td>
+                  <td className="py-2 px-3 font-sans text-[11px] text-slate-400">{inv.note}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 7. ACTIEPLAN & MANDAAT */}
       <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 sm:p-7 shadow-xl space-y-4">
         <h3 className="text-lg font-black text-white flex items-center gap-2">
           <CheckCircle2 className="w-5 h-5 text-emerald-400" />

@@ -38,6 +38,8 @@ export async function GET(request) {
           current_peak_kw: BOMMA_TESSENDERLO_DATA.profile.capacity_peak_kw
         },
         monthly_history: BOMMA_TESSENDERLO_DATA.monthly_breakdown,
+        two_year_comparison: BOMMA_TESSENDERLO_DATA.two_year_comparison,
+        historical_invoices: BOMMA_TESSENDERLO_DATA.historical_invoices,
         market: {
           profile: BOMMA_TESSENDERLO_DATA.profile,
           current_contract: BOMMA_TESSENDERLO_DATA.current_contract,

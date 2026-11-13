@@ -297,5 +297,48 @@ export const BOMMA_TESSENDERLO_DATA = {
       status: "Administratie",
       desc: "Luminus adresseert momenteel verkeerd aan 'heer Macours'. Zet Kristof Heselmans als gemachtigd contactpersoon of zet de tenaamstelling correct op 'Mevr. Jacqueline Macours'."
     }
+  ],
+  two_year_comparison: {
+    year_2024_2025: {
+      period: "01.06.2024 - 31.05.2025",
+      elec_kwh: 1519.49,
+      gas_kwh: 6105.07,
+      total_cost_eur: 1100.12,
+      advances_paid_eur: 1144.00,
+      settlement_eur: -43.88
+    },
+    year_2025_2026: {
+      period: "01.06.2025 - 31.05.2026",
+      elec_kwh: 1535.00,
+      gas_kwh: 5613.00,
+      total_cost_eur: 1024.70,
+      advances_paid_eur: 1098.00,
+      settlement_eur: -73.30
+    },
+    average: {
+      elec_kwh: 1527,
+      gas_kwh: 5859,
+      total_cost_eur: 1062.41
+    }
+  },
+  historical_invoices: [
+    { number: "9594167237", date: "09.06.2025", type: "Jaarafrekening", period: "01.06.2024 - 31.05.2025", elec_excl: "511,07", gas_excl: "526,78", total_incl: "−43,88", note: "Verbruikskost €1.100,12 min €1.144 voorschotten = creditnota", is_credit: true },
+    { number: "3154123202", date: "28.06.2025", type: "Voorschot", period: "jun 2025", elec_excl: "44,34", gas_excl: "43,40", total_incl: "93,00", note: "Maandvoorschot", is_credit: false },
+    { number: "4274187530", date: "28.07.2025", type: "Voorschot", period: "jul 2025", elec_excl: "37,74", gas_excl: "34,91", total_incl: "77,00", note: "Zomervoorschot verlaagd", is_credit: false },
+    { number: "6087978774", date: "28.08.2025", type: "Voorschot", period: "aug 2025", elec_excl: "48,11", gas_excl: "44,34", total_incl: "98,00", note: "Maandvoorschot", is_credit: false },
+    { number: "3288076118", date: "28.09.2025", type: "Voorschot", period: "sep 2025", elec_excl: "48,11", gas_excl: "44,34", total_incl: "98,00", note: "Maandvoorschot", is_credit: false },
+    { number: "4274297932", date: "28.10.2025", type: "Voorschot", period: "okt 2025", elec_excl: "48,11", gas_excl: "44,34", total_incl: "98,00", note: "Maandvoorschot", is_credit: false },
+    { number: "4408053995", date: "28.11.2025", type: "Voorschot", period: "nov 2025", elec_excl: "48,11", gas_excl: "44,34", total_incl: "98,00", note: "Maandvoorschot", is_credit: false },
+    { number: "8194402167", date: "28.01.2026", type: "Voorschot", period: "jan 2026", elec_excl: "48,11", gas_excl: "44,34", total_incl: "98,00", note: "Wintervoorschot", is_credit: false },
+    { number: "3288229298", date: "01.03.2026", type: "Voorschot", period: "feb 2026", elec_excl: "47,17", gas_excl: "33,02", total_incl: "85,00", note: "Voorschot bijgesteld", is_credit: false },
+    { number: "8048231045", date: "28.03.2026", type: "Voorschot", period: "mrt 2026", elec_excl: "47,17", gas_excl: "33,02", total_incl: "85,00", note: "Voorschot bijgesteld", is_credit: false },
+    { number: "4274482804", date: "28.04.2026", type: "Voorschot", period: "apr 2026", elec_excl: "47,17", gas_excl: "33,02", total_incl: "85,00", note: "Voorschot bijgesteld", is_credit: false },
+    { number: "3714451847", date: "28.05.2026", type: "Voorschot", period: "mei 2026", elec_excl: "47,17", gas_excl: "33,02", total_incl: "85,00", note: "Laatste voorschot facturatiejaar", is_credit: false },
+    { number: "4688193089", date: "08.06.2026", type: "Jaarafrekening", period: "01.06.2025 - 31.05.2026", elec_excl: "529,26", gas_excl: "437,44", total_incl: "−73,30", note: "Verbruikskost €1.024,70 min €1.098 voorschotten = creditnota", is_credit: true },
+    { number: "8754514429", date: "28.06.2026", type: "Voorschot", period: "jun 2026", elec_excl: "44,34", gas_excl: "42,45", total_incl: "92,00", note: "Nieuw voorschot 2026-2027", is_credit: false },
+    { number: "7208318486", date: "28.07.2026", type: "Voorschot", period: "jul 2026", elec_excl: "44,34", gas_excl: "42,45", total_incl: "92,00", note: "Voorschot 2026-2027", is_credit: false },
+    { number: "4688274939", date: "28.08.2026", type: "Voorschot", period: "aug 2026", elec_excl: "44,34", gas_excl: "42,45", total_incl: "92,00", note: "Voorschot 2026-2027", is_credit: false },
+    { number: "8328522443", date: "28.09.2026", type: "Voorschot", period: "sep 2026", elec_excl: "44,34", gas_excl: "42,45", total_incl: "92,00", note: "Voorschot 2026-2027", is_credit: false },
+    { number: "4274666658", date: "28.10.2026", type: "Voorschot", period: "okt 2026", elec_excl: "44,34", gas_excl: "42,45", total_incl: "92,00", note: "Meest recent aangerekende voorschot", is_credit: false }
   ]
 };
