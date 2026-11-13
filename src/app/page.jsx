@@ -30,8 +30,12 @@ import {
   Gift,
   Target,
   FileText,
-  HeartHandshake
+  HeartHandshake,
+  Building2,
+  Home,
+  MapPin
 } from 'lucide-react';
+import BommaTessenderloView from '../components/BommaTessenderloView';
 import { 
   ResponsiveContainer, 
   BarChart, 
@@ -52,6 +56,7 @@ export default function CFODashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedSite, setSelectedSite] = useState('kruisstraat');
   const [activeTab, setActiveTab] = useState('decision'); // Default directly to CFO Decision Board!
   const [selectedWeek, setSelectedWeek] = useState(null);
 
@@ -61,10 +66,10 @@ export default function CFODashboard() {
   const [simGas, setSimGas] = useState(1267);
   const [simMarketShift, setSimMarketShift] = useState(0);
 
-  const fetchData = async () => {
+  const fetchData = async (siteId = selectedSite) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/analytics');
+      const res = await fetch(`/api/analytics?site=${siteId}`);
       const json = await res.json();
       if (json.success) {
         setData(json);
@@ -81,8 +86,22 @@ export default function CFODashboard() {
     }
   };
 
+  const handleSiteChange = (siteId) => {
+    setSelectedSite(siteId);
+    if (siteId === 'bomma_tessenderlo') {
+      setSimImport(1535);
+      setSimExport(0);
+      setSimGas(492);
+    } else {
+      setSimImport(4452);
+      setSimExport(4863);
+      setSimGas(1267);
+    }
+    fetchData(siteId);
+  };
+
   useEffect(() => {
-    fetchData();
+    fetchData('kruisstraat');
   }, []);
 
   // Recalculate market contracts dynamically based on simulator sliders
@@ -142,7 +161,11 @@ export default function CFODashboard() {
     );
   }
 
-  const { summary, weeks, days, hourly, market } = data;
+  const summary = data?.summary || {};
+  const weeks = data?.weeks || [];
+  const days = data?.days || [];
+  const hourly = data?.hourly || [];
+  const market = data?.market || {};
   const chartWeeks = [...weeks].reverse();
   const bestSwitch = simulatedContracts.find(c => !c.is_current && c.sim_delta > 0);
   const decisionBoard = market?.decision_board;
@@ -161,19 +184,50 @@ export default function CFODashboard() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-black tracking-tight text-white">HEMS Executive CFO Suite</h1>
+                <h1 className="text-lg font-black tracking-tight text-white">HEMS Multi-Site Energy Suite</h1>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  België / Vlaanderen
+                  Vlaanderen (Fluvius)
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Data Warehouse Live · Huidig Contract: <strong className="text-slate-200">Mega Smart (Dynamisch)</strong>
+                {selectedSite === 'bomma_tessenderlo' ? (
+                  <>Actieve Locatie: <strong className="text-amber-300 font-semibold">Bomma Tessenderlo</strong> · Vismarkt 18/2 (Fluvius Limburg)</>
+                ) : (
+                  <>Actieve Locatie: <strong className="text-indigo-300 font-semibold">Kruisstraat 131</strong> · Duffel (Fluvius Antwerpen)</>
+                )}
               </p>
             </div>
           </div>
 
-          {/* Quick CFO Switch Alert Badge */}
-          {bestSwitch && (
+          {/* Multi-Site Selector */}
+          <div className="flex items-center gap-1.5 p-1 bg-slate-950/90 rounded-xl border border-slate-800 shadow-inner">
+            <button
+              onClick={() => handleSiteChange('kruisstraat')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                selectedSite === 'kruisstraat'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/50'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>Kruisstraat (Duffel)</span>
+            </button>
+            <button
+              onClick={() => handleSiteChange('bomma_tessenderlo')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                selectedSite === 'bomma_tessenderlo'
+                  ? 'bg-amber-600 text-white shadow-md shadow-amber-900/50'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Bomma Tessenderlo</span>
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Luminus Wijziging Actie" />
+            </button>
+          </div>
+
+          {/* Quick CFO Switch Alert Badge (only if kruisstraat) */}
+          {selectedSite === 'kruisstraat' && bestSwitch && (
             <div 
               onClick={() => setActiveTab('decision')}
               className="cursor-pointer flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-indigo-950/50 border border-indigo-500/30 hover:border-indigo-400 transition"
@@ -190,9 +244,9 @@ export default function CFODashboard() {
 
           <div className="flex items-center gap-2 self-end md:self-center">
             <button
-              onClick={fetchData}
+              onClick={() => fetchData(selectedSite)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition"
-              title="Vernieuw data uit Neon DB"
+              title="Vernieuw data"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Sync</span>
@@ -202,61 +256,70 @@ export default function CFODashboard() {
 
         {/* Tab Bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-2 overflow-x-auto py-2">
-          <button
-            onClick={() => setActiveTab('decision')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              activeTab === 'decision'
-                ? 'bg-gradient-to-r from-emerald-600 to-indigo-600 text-white shadow-md shadow-emerald-950/50'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`}
-          >
-            <Award className="w-4 h-4" />
-            CFO Decision Board & Roadmap
-          </button>
-          <button
-            onClick={() => setActiveTab('market')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              activeTab === 'market'
-                ? 'bg-slate-800 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`}
-          >
-            <ArrowRightLeft className="w-4 h-4" />
-            Marktvergelijker & Simulator
-          </button>
-          <button
-            onClick={() => setActiveTab('cockpit')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              activeTab === 'cockpit'
-                ? 'bg-slate-800 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            Executive Cockpit & KPIs
-          </button>
-          <button
-            onClick={() => setActiveTab('weekly')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              activeTab === 'weekly'
-                ? 'bg-slate-800 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            Wekelijkse Drill-Down ({weeks.length} Wkn)
-          </button>
-          <button
-            onClick={() => setActiveTab('trends')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              activeTab === 'trends'
-                ? 'bg-slate-800 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`}
-          >
-            <Flame className="w-4 h-4" />
-            Seizoensgraaddagen (HDD)
-          </button>
+          {selectedSite === 'bomma_tessenderlo' ? (
+            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-bold text-amber-300">
+              <Building2 className="w-4 h-4 text-amber-400" />
+              <span>Dossier: Jacqueline Macours (Vismarkt 18/2, Tessenderlo) · Luminus Wijziging & Switch Audit</span>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={() => setActiveTab('decision')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'decision'
+                    ? 'bg-gradient-to-r from-emerald-600 to-indigo-600 text-white shadow-md shadow-emerald-950/50'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                <Award className="w-4 h-4" />
+                CFO Decision Board & Roadmap
+              </button>
+              <button
+                onClick={() => setActiveTab('market')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'market'
+                    ? 'bg-slate-800 text-white shadow'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                <ArrowRightLeft className="w-4 h-4" />
+                Marktvergelijker & Simulator
+              </button>
+              <button
+                onClick={() => setActiveTab('cockpit')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'cockpit'
+                    ? 'bg-slate-800 text-white shadow'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                <Activity className="w-4 h-4" />
+                Executive Cockpit & KPIs
+              </button>
+              <button
+                onClick={() => setActiveTab('weekly')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'weekly'
+                    ? 'bg-slate-800 text-white shadow'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                Wekelijkse Drill-Down ({weeks.length} Wkn)
+              </button>
+              <button
+                onClick={() => setActiveTab('trends')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+                  activeTab === 'trends'
+                    ? 'bg-slate-800 text-white shadow'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                }`}
+              >
+                <Flame className="w-4 h-4" />
+                Seizoensgraaddagen (HDD)
+              </button>
+            </>
+          )}
 
           <Link
             href="/advies"
@@ -270,6 +333,10 @@ export default function CFODashboard() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+        {selectedSite === 'bomma_tessenderlo' ? (
+          <BommaTessenderloView data={data} />
+        ) : (
+          <>
 
         {/* ========================================================================= */}
         {/* TAB 0: CFO DECISION BOARD & STRATEGIC ROADMAP */}
@@ -1282,6 +1349,8 @@ export default function CFODashboard() {
               </div>
             </div>
           </div>
+        )}
+          </>
         )}
 
       </div>

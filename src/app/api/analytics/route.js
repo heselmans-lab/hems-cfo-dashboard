@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
+import { SITES, BOMMA_TESSENDERLO_DATA } from '../../../data/sitesData';
 
 const connectionString = 
   process.env.DATABASE_URL || 
@@ -14,105 +15,138 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
-    const client = await pool.connect();
+    const { searchParams } = new URL(request.url);
+    const siteParam = searchParams.get('site') || 'kruisstraat';
 
-    // 1. Fetch Weekly KPIs
-    const weeklyRes = await client.query(`
-      SELECT 
-        year_week, 
-        to_char(start_date, 'YYYY-MM-DD') as start_date, 
-        to_char(end_date, 'YYYY-MM-DD') as end_date, 
-        total_energy_cost_eur::float, 
-        electricity_cost_eur::float, 
-        gas_cost_eur::float, 
-        total_import_kwh::float, 
-        total_export_kwh::float, 
-        total_solar_kwh::float, 
-        total_gas_m3::float, 
-        solar_self_consumption_pct::float, 
-        arbitrage_savings_eur::float, 
-        weekly_avg_outdoor_temp_c::float, 
-        weekly_hdd::float, 
-        capacity_peak_max_kw::float
-      FROM hems_weekly_economic_kpi
-      ORDER BY year_week DESC;
-    `);
+    // SITE 2: BOMMA TESSENDERLO (STRICTLY SEGREGATED)
+    if (siteParam === 'bomma_tessenderlo') {
+      return NextResponse.json({
+        success: true,
+        current_site: 'bomma_tessenderlo',
+        available_sites: SITES,
+        site_info: BOMMA_TESSENDERLO_DATA.site,
+        profile: BOMMA_TESSENDERLO_DATA.profile,
+        summary: {
+          total_cost_eur: BOMMA_TESSENDERLO_DATA.current_contract.net_annual_total_eur,
+          total_elec_cost_eur: BOMMA_TESSENDERLO_DATA.current_contract.elec_cost_eur,
+          total_gas_cost_eur: BOMMA_TESSENDERLO_DATA.current_contract.gas_cost_eur,
+          total_solar_kwh: 0,
+          total_import_kwh: BOMMA_TESSENDERLO_DATA.profile.annual_import_kwh,
+          total_export_kwh: 0,
+          total_gas_m3: BOMMA_TESSENDERLO_DATA.profile.annual_gas_m3,
+          total_arbitrage_eur: 0,
+          current_peak_kw: BOMMA_TESSENDERLO_DATA.profile.capacity_peak_kw
+        },
+        monthly_history: BOMMA_TESSENDERLO_DATA.monthly_breakdown,
+        market: {
+          profile: BOMMA_TESSENDERLO_DATA.profile,
+          current_contract: BOMMA_TESSENDERLO_DATA.current_contract,
+          proposed_renewal: BOMMA_TESSENDERLO_DATA.proposed_renewal,
+          mijnenergie_audit: BOMMA_TESSENDERLO_DATA.market_audit,
+          contracts: BOMMA_TESSENDERLO_DATA.contracts
+        },
+        action_plan: BOMMA_TESSENDERLO_DATA.action_plan
+      });
+    }
 
-    // 2. Fetch Recent Daily KPIs (last 30 days)
-    const dailyRes = await client.query(`
-      SELECT 
-        to_char(date, 'YYYY-MM-DD') as date, 
-        total_energy_cost_eur::float, 
-        electricity_cost_eur::float, 
-        gas_cost_eur::float, 
-        solar_self_consumption_pct::float, 
-        heatpump_vs_gas_arbitrage_savings_eur::float, 
-        capacity_peak_max_kw::float, 
-        heating_degree_days::float, 
-        thermal_loss_factor_kwh_per_hdd::float
-      FROM hems_daily_economic_kpi
-      ORDER BY date DESC
-      LIMIT 30;
-    `);
+    // SITE 1: KRUISSTRAAT 131 DUFFEL (DEFAULT HEMS LAB)
+    let summary = {};
+    let weeks = [];
+    let days = [];
+    let hourly = [];
 
-    // 3. Fetch Recent Hourly Telemetry (last 24 hours)
-    const hourlyRes = await client.query(`
-      SELECT 
-        to_char(timestamp, 'HH24:MI') as hour_time,
-        timestamp,
-        grid_import_kwh::float,
-        grid_export_kwh::float,
-        solar_generation_kwh::float,
-        gas_consumption_m3::float,
-        heatpump_power_kwh::float,
-        electricity_price_eur_kwh::float,
-        quarter_peak_power_w::float,
-        outdoor_temp_c::float,
-        indoor_bureau_temp_c::float
-      FROM hems_hourly_telemetry
-      ORDER BY timestamp DESC
-      LIMIT 24;
-    `);
+    if (connectionString) {
+      try {
+        const client = await pool.connect();
 
-    // 4. Overall Totals
-    const totalsRes = await client.query(`
-      SELECT 
-        COALESCE(SUM(total_energy_cost_eur), 0)::float as total_cost_eur,
-        COALESCE(SUM(electricity_cost_eur), 0)::float as total_elec_cost_eur,
-        COALESCE(SUM(gas_cost_eur), 0)::float as total_gas_cost_eur,
-        COALESCE(SUM(total_solar_kwh), 0)::float as total_solar_kwh,
-        COALESCE(SUM(total_import_kwh), 0)::float as total_import_kwh,
-        COALESCE(SUM(total_export_kwh), 0)::float as total_export_kwh,
-        COALESCE(SUM(total_gas_m3), 0)::float as total_gas_m3,
-        COALESCE(SUM(arbitrage_savings_eur), 0)::float as total_arbitrage_eur,
-        COALESCE(MAX(capacity_peak_max_kw), 5.23)::float as current_peak_kw
-      FROM hems_weekly_economic_kpi;
-    `);
+        // 1. Fetch Weekly KPIs
+        const weeklyRes = await client.query(`
+          SELECT 
+            year_week, 
+            to_char(start_date, 'YYYY-MM-DD') as start_date, 
+            to_char(end_date, 'YYYY-MM-DD') as end_date, 
+            total_energy_cost_eur::float, 
+            electricity_cost_eur::float, 
+            gas_cost_eur::float, 
+            total_import_kwh::float, 
+            total_export_kwh::float, 
+            total_solar_kwh::float, 
+            total_gas_m3::float, 
+            solar_self_consumption_pct::float, 
+            arbitrage_savings_eur::float, 
+            weekly_avg_outdoor_temp_c::float, 
+            weekly_hdd::float, 
+            capacity_peak_max_kw::float
+          FROM hems_weekly_economic_kpi
+          ORDER BY year_week DESC;
+        `);
 
-    client.release();
+        // 2. Fetch Recent Daily KPIs (last 30 days)
+        const dailyRes = await client.query(`
+          SELECT 
+            to_char(date, 'YYYY-MM-DD') as date, 
+            total_energy_cost_eur::float, 
+            electricity_cost_eur::float, 
+            gas_cost_eur::float, 
+            solar_self_consumption_pct::float, 
+            heatpump_vs_gas_arbitrage_savings_eur::float, 
+            capacity_peak_max_kw::float, 
+            heating_degree_days::float, 
+            thermal_loss_factor_kwh_per_hdd::float
+          FROM hems_daily_economic_kpi
+          ORDER BY date DESC
+          LIMIT 30;
+        `);
 
-    const summary = totalsRes.rows[0] || {};
-    const weeks = weeklyRes.rows || [];
-    const days = dailyRes.rows || [];
-    const hourly = (hourlyRes.rows || []).reverse();
+        // 3. Fetch Recent Hourly Telemetry (last 24 hours)
+        const hourlyRes = await client.query(`
+          SELECT 
+            to_char(timestamp, 'HH24:MI') as hour_time,
+            timestamp,
+            grid_import_kwh::float,
+            grid_export_kwh::float,
+            solar_generation_kwh::float,
+            gas_consumption_m3::float,
+            heatpump_power_kwh::float,
+            electricity_price_eur_kwh::float,
+            quarter_peak_power_w::float,
+            outdoor_temp_c::float,
+            indoor_bureau_temp_c::float
+          FROM hems_hourly_telemetry
+          ORDER BY timestamp DESC
+          LIMIT 24;
+        `);
 
-    // 5. Officially Calibrated Profile (Direct Fluvius Digital Meter Coupling 01/11/2026)
-    // Address: Regio Vlaanderen
-    // Stroom EAN: 541448860002535528 (4.452 kWh afname, 4.863 kWh injectie, 5,23 kW piek)
-    // Gas EAN: 541448860003166066 (14.316 kWh / 1.267 m3 gas)
+        // 4. Overall Totals
+        const totalsRes = await client.query(`
+          SELECT 
+            COALESCE(SUM(total_energy_cost_eur), 0)::float as total_cost_eur,
+            COALESCE(SUM(electricity_cost_eur), 0)::float as total_elec_cost_eur,
+            COALESCE(SUM(gas_cost_eur), 0)::float as total_gas_cost_eur,
+            COALESCE(SUM(total_solar_kwh), 0)::float as total_solar_kwh,
+            COALESCE(SUM(total_import_kwh), 0)::float as total_import_kwh,
+            COALESCE(SUM(total_export_kwh), 0)::float as total_export_kwh,
+            COALESCE(SUM(total_gas_m3), 0)::float as total_gas_m3,
+            COALESCE(SUM(arbitrage_savings_eur), 0)::float as total_arbitrage_eur,
+            COALESCE(MAX(capacity_peak_max_kw), 5.23)::float as current_peak_kw
+          FROM hems_weekly_economic_kpi;
+        `);
+
+        client.release();
+
+        summary = totalsRes.rows[0] || {};
+        weeks = weeklyRes.rows || [];
+        days = dailyRes.rows || [];
+        hourly = (hourlyRes.rows || []).reverse();
+      } catch (dbErr) {
+        console.warn('Database query fallback (Kruisstraat):', dbErr.message);
+      }
+    }
+
+    // Calibrated Market Profile for Kruisstraat
+    const kruisstraatSite = SITES[0];
     const market = {
-      profile: {
-        annual_import_kwh: 4452,
-        annual_export_kwh: 4863,
-        annual_gas_kwh: 14316,
-        annual_gas_m3: 1267,
-        capacity_peak_kw: 5.23,
-        fluvius_peak_tariff_annual_eur: 240,
-        current_belpex_spot_eur_kwh: 0.115,
-        ean_elec: '541448860002535528',
-        ean_gas: '541448860003166066',
-        meter_status: 'Gekoppeld via Fluvius tot 01/11/2029'
-      },
+      profile: kruisstraatSite.profile,
       current_contract: {
         provider: 'Mega',
         name: 'Smart Dynamisch',
@@ -125,7 +159,6 @@ export async function GET(request) {
         net_annual_total_eur: 2996.00,
       },
 
-      // MIJNENERGIE.BE DEEP DIVE AUDIT & COMPARISON
       mijnenergie_audit: {
         title: "Waarom beveelt Mijnenergie.be iets anders aan dan pure coöperaties?",
         verdict: "Mijnenergie toont géén coöperaties (zoals Ecopower) omdat die geen commissie betalen. In plaats daarvan pusht Mijnenergie 'Dual Fuel' combideals met gigantische éénmalige welkomstkortingen (Luminus -€959, Engie -€804) die na 12 maanden vervallen.",
@@ -268,31 +301,31 @@ export async function GET(request) {
           formula_elec: 'Luminus ComfyFlex min €490,44 welkomstkorting',
           formula_gas: 'Luminus ComfyFlex Gas min €468,53 welkomstkorting',
           inj_rate_c_kwh: 3.80,
-          fixed_fee_annual_eur: 135,
-          elec_cost_eur: 1340,
-          gas_cost_eur: 1705,
+          fixed_fee_annual_eur: 165,
+          elec_cost_eur: 1475,
+          gas_cost_eur: 1570,
           inj_credit_eur: 184.79,
           net_annual_total_eur: 2860.30,
           delta_vs_current_eur: 135.70,
           delta_pct: 4.5,
           is_recommended: false,
-          action_status: 'Tijdelijke Promo (€959)',
-          highlight: 'Lijkt voordelig door €959 korting in jaar 1, maar in jaar 2 schiet de kost naar €3.819/jaar door hoge basistarieven.'
+          action_status: 'Mijnenergie Advies',
+          highlight: 'Eist een heronderhandeling of switch na 11 maanden om de bruto prijsstijging van €958 in jaar 2 te vermijden.'
         },
         {
-          id: 'engie_easy_fixed_dual',
+          id: 'engie_easy_vast',
           provider: 'Engie',
-          name: 'Easy Fixed Combi (Mijnenergie #2)',
-          badge: '🛡️ 100% Vast (Top Veiligheid)',
-          badge_color: 'cyan',
-          type: '100% Groen Vast (12 Mnd)',
-          formula_elec: 'Vaste stroomprijs min €363 korting',
-          formula_gas: 'Vaste gasprijs min €441,42 korting',
-          inj_rate_c_kwh: 3.50,
+          name: 'Easy Fixed (1 Jaar 100% Vast)',
+          badge: '100% Prijsgarantie (Vast)',
+          badge_color: 'blue',
+          type: 'Vast Tarief (1 Jaar)',
+          formula_elec: 'Engie Easy Fixed min €363 welkomstbonus',
+          formula_gas: 'Engie Easy Fixed Gas min €441 welkomstbonus',
+          inj_rate_c_kwh: 3.20,
           fixed_fee_annual_eur: 140,
-          elec_cost_eur: 1479,
+          elec_cost_eur: 1465,
           gas_cost_eur: 1558,
-          inj_credit_eur: 170.20,
+          inj_credit_eur: 155.62,
           net_annual_total_eur: 2867.45,
           delta_vs_current_eur: 128.55,
           delta_pct: 4.3,
@@ -326,6 +359,9 @@ export async function GET(request) {
 
     return NextResponse.json({
       success: true,
+      current_site: 'kruisstraat',
+      available_sites: SITES,
+      site_info: kruisstraatSite,
       summary,
       weeks,
       days,

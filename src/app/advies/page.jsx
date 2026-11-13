@@ -264,9 +264,63 @@ Kan jij me helpen om deze overstap in orde te brengen? We hebben enkel de laatst
             <h2 id="stap1-titel" className={`font-black text-slate-900 mb-2 ${fontClass['3xl']}`}>
               Stap 1: In wat voor woning woon je?
             </h2>
-            <p className={`text-slate-600 mb-8 font-medium ${fontClass.lg}`}>
+            <p className={`text-slate-600 mb-6 font-medium ${fontClass.lg}`}>
               Kies eenvoudig wat het beste past bij jouw situatie.
             </p>
+
+            {/* Directe Locatie Presets */}
+            <div className="mb-8 p-5 rounded-2xl bg-amber-50/80 border-2 border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-xl shrink-0 shadow-md">
+                  👵
+                </div>
+                <div>
+                  <span className={`font-black text-slate-900 block ${fontClass.base}`}>Direct een bewaarde locatie inladen?</span>
+                  <span className="text-slate-600 block text-xs">Vult automatisch alle geverifieerde meterstanden van Fluvius in</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHousingType('appartement');
+                    setHasGas(true);
+                    setHasSolar(false);
+                    setCurrentSupplier('luminus');
+                    setInputMode('kwh');
+                    setKwhElec(1535);
+                    setKwhGas(5613);
+                    setMonthlyElec(47);
+                    setMonthlyGas(45);
+                    setStep(3);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-1.5"
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span>Bomma (Tessenderlo)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHousingType('huis');
+                    setHasGas(true);
+                    setHasSolar(true);
+                    setCurrentSupplier('anders');
+                    setInputMode('kwh');
+                    setKwhElec(4452);
+                    setKwhGas(14316);
+                    setKwhSolar(4863);
+                    setStep(3);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-1.5"
+                >
+                  <Home className="w-4 h-4" />
+                  <span>Kruisstraat (Duffel)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
 
             <fieldset className="mb-8">
               <legend className={`font-bold text-slate-800 mb-4 block ${fontClass.xl}`}>
