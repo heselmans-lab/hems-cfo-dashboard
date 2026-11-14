@@ -33,8 +33,12 @@ import {
   HeartHandshake,
   Building2,
   Home,
-  MapPin
+  MapPin,
+  LogOut,
+  User,
+  Shield
 } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 import BommaTessenderloView from '../components/BommaTessenderloView';
 import { 
   ResponsiveContainer, 
@@ -53,6 +57,7 @@ import {
 } from 'recharts';
 
 export default function CFODashboard() {
+  const { data: session } = useSession();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -60,19 +65,27 @@ export default function CFODashboard() {
   const [activeTab, setActiveTab] = useState('decision'); // Default directly to CFO Decision Board!
   const [selectedWeek, setSelectedWeek] = useState(null);
 
+  // User role & allowed sites from server data or session
+  const allowedSites = data?.user?.allowedSites || session?.user?.allowedSites || ['bomma_tessenderlo'];
+  const userRole = data?.user?.role || session?.user?.role || 'tessenderlo_family';
+
   // Switch Simulator state (interactive what-if sliders)
   const [simImport, setSimImport] = useState(4452);
   const [simExport, setSimExport] = useState(4863);
   const [simGas, setSimGas] = useState(1267);
   const [simMarketShift, setSimMarketShift] = useState(0);
 
-  const fetchData = async (siteId = selectedSite) => {
+  const fetchData = async (siteId) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/analytics?site=${siteId}`);
+      const target = siteId || selectedSite;
+      const res = await fetch(`/api/analytics?site=${target}`);
       const json = await res.json();
       if (json.success) {
         setData(json);
+        if (json.current_site) {
+          setSelectedSite(json.current_site);
+        }
         if (json.weeks && json.weeks.length > 0) {
           setSelectedWeek(json.weeks[0]);
         }
@@ -87,6 +100,7 @@ export default function CFODashboard() {
   };
 
   const handleSiteChange = (siteId) => {
+    if (!allowedSites.includes(siteId)) return;
     setSelectedSite(siteId);
     if (siteId === 'bomma_tessenderlo') {
       setSimImport(1535);
@@ -101,7 +115,14 @@ export default function CFODashboard() {
   };
 
   useEffect(() => {
-    fetchData('kruisstraat');
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedSite = urlParams.get('site');
+    if (requestedSite) {
+      setSelectedSite(requestedSite);
+      fetchData(requestedSite);
+    } else {
+      fetchData();
+    }
   }, []);
 
   // Recalculate market contracts dynamically based on simulator sliders
@@ -199,35 +220,41 @@ export default function CFODashboard() {
             </div>
           </div>
 
-          {/* Multi-Site Selector */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-950/90 rounded-xl border border-slate-800 shadow-inner">
-            <button
-              onClick={() => handleSiteChange('kruisstraat')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                selectedSite === 'kruisstraat'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/50'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-              }`}
-            >
-              <Home className="w-3.5 h-3.5" />
-              <span>Kruisstraat (Duffel)</span>
-            </button>
-            <button
-              onClick={() => handleSiteChange('bomma_tessenderlo')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                selectedSite === 'bomma_tessenderlo'
-                  ? 'bg-amber-600 text-white shadow-md shadow-amber-900/50'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-              }`}
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Bomma Tessenderlo</span>
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Luminus Wijziging Actie" />
-            </button>
-          </div>
+          {/* Multi-Site Selector (Only visible if user has access to more than 1 site) */}
+          {allowedSites.length > 1 && (
+            <div className="flex items-center gap-1.5 p-1 bg-slate-950/90 rounded-xl border border-slate-800 shadow-inner">
+              {allowedSites.includes('kruisstraat') && (
+                <button
+                  onClick={() => handleSiteChange('kruisstraat')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                    selectedSite === 'kruisstraat'
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/50'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Home className="w-3.5 h-3.5" />
+                  <span>Kruisstraat (Duffel)</span>
+                </button>
+              )}
+              {allowedSites.includes('bomma_tessenderlo') && (
+                <button
+                  onClick={() => handleSiteChange('bomma_tessenderlo')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                    selectedSite === 'bomma_tessenderlo'
+                      ? 'bg-amber-600 text-white shadow-md shadow-amber-900/50'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>Bomma Tessenderlo</span>
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Luminus Wijziging Actie" />
+                </button>
+              )}
+            </div>
+          )}
 
-          {/* Quick CFO Switch Alert Badge (only if kruisstraat) */}
-          {selectedSite === 'kruisstraat' && bestSwitch && (
+          {/* Quick CFO Switch Alert Badge (only if kruisstraat is accessible) */}
+          {selectedSite === 'kruisstraat' && allowedSites.includes('kruisstraat') && bestSwitch && (
             <div 
               onClick={() => setActiveTab('decision')}
               className="cursor-pointer flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-indigo-950/50 border border-indigo-500/30 hover:border-indigo-400 transition"
@@ -251,6 +278,29 @@ export default function CFODashboard() {
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Sync</span>
             </button>
+
+            {/* User Profile & Logout */}
+            <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
+              <div className="text-right hidden sm:block">
+                <div className="text-xs font-semibold text-slate-200">
+                  {session?.user?.name || session?.user?.email || (userRole === 'admin' ? 'Kristof' : 'Familielid')}
+                </div>
+                <div className="text-[10px]">
+                  {userRole === 'admin' ? (
+                    <span className="text-indigo-400 font-medium">Beheerder</span>
+                  ) : (
+                    <span className="text-amber-400 font-medium">Familie Tessenderlo</span>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                title="Afmelden"
+                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import { SITES, BOMMA_TESSENDERLO_DATA } from '../../../data/sitesData';
+import { getServerAuthSession } from '@/lib/auth';
 
 const connectionString = 
   process.env.DATABASE_URL || 
@@ -15,15 +16,42 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
+    const session = await getServerAuthSession();
+    // Allow admin access in local development without session, otherwise require auth
+    const userRole = session?.user?.role || (process.env.NODE_ENV === 'development' ? 'admin' : 'unauthorized');
+    const allowedSites = session?.user?.allowedSites || (process.env.NODE_ENV === 'development' ? ['kruisstraat', 'bomma_tessenderlo'] : []);
+
+    if (userRole === 'unauthorized' || allowedSites.length === 0) {
+      return NextResponse.json({
+        success: false,
+        error: 'Niet geautoriseerd. Gelieve eerst in te loggen met uw geautoriseerde Google-account.'
+      }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const siteParam = searchParams.get('site') || 'kruisstraat';
+    let siteParam = searchParams.get('site');
+    if (!siteParam) {
+      siteParam = userRole === 'admin' ? 'kruisstraat' : 'bomma_tessenderlo';
+    }
+
+    // Strict role check: if requested site is not permitted for this user, deny access
+    if (!allowedSites.includes(siteParam)) {
+      return NextResponse.json({
+        success: false,
+        error: `Geen toegang tot site '${siteParam}'. Uw account heeft uitsluitend toegang tot het dossier van Bomma in Tessenderlo.`
+      }, { status: 403 });
+    }
+
+    // Filter available_sites so only allowed sites are sent to client
+    const filteredSites = SITES.filter(s => allowedSites.includes(s.id));
 
     // SITE 2: BOMMA TESSENDERLO (STRICTLY SEGREGATED)
     if (siteParam === 'bomma_tessenderlo') {
       return NextResponse.json({
         success: true,
         current_site: 'bomma_tessenderlo',
-        available_sites: SITES,
+        available_sites: filteredSites,
+        user: session?.user || { role: userRole, allowedSites },
         site_info: BOMMA_TESSENDERLO_DATA.site,
         profile: BOMMA_TESSENDERLO_DATA.profile,
         summary: {
@@ -362,7 +390,8 @@ export async function GET(request) {
     return NextResponse.json({
       success: true,
       current_site: 'kruisstraat',
-      available_sites: SITES,
+      available_sites: filteredSites,
+      user: session?.user || { role: userRole, allowedSites },
       site_info: kruisstraatSite,
       summary,
       weeks,

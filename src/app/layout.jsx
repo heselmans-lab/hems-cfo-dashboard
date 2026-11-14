@@ -13,13 +13,17 @@ export const viewport = {
   maximumScale: 1,
 };
 
+import AuthProvider from '../components/AuthProvider';
+
 export default function RootLayout({ children }) {
   return (
     <html lang="nl" className="dark">
       <head>
         <link rel="apple-touch-icon" href="/icon.png" />
       </head>
-      <body className="antialiased bg-slate-950 text-slate-100">{children}</body>
+      <body className="antialiased bg-slate-950 text-slate-100">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
