@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
   Building2, 
@@ -19,7 +19,10 @@ import {
   Lock,
   HeartHandshake,
   DollarSign,
-  Info
+  Info,
+  Crown,
+  Copy,
+  Check
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -38,6 +41,36 @@ export default function BommaTessenderloView({ data }) {
   const proposedRenewal = market?.proposed_renewal;
   const contracts = market?.contracts || [];
   const audit = market?.mijnenergie_audit;
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyFamilySummary = () => {
+    const text = `*Energieadvies Bomma (Jacqueline Macours - Tessenderlo)*
+Weblink: https://bomma.heselmans.com
+
+1. *PRIORITEIT #1: SOCIAAL TARIEF (Besparing > €740/jaar)*
+Ontvangt Jacqueline IGO, GRAPA of een verhoogde tegemoetkoming (BIM)? Dan zakt haar totale jaarkost van ~€1.500 naar *slechts ± €745 all-in*!
+👉 Actie: Controleer haar recentste pensioenfiche. Staat het niet op haar Luminus-factuur, bezorg dan het attest van de pensioendienst/OCMW aan Luminus.
+
+2. *LUMINUS WIJZIGING (11.01.2027) & JURIDISCHE GERUSTSTELLING*
+- Geen paniek: Hoewel Luminus spreekt over een contract van 2 jaar en weigering voor 6 december, is een particulier in België *wettelijk NOOIT vastgeketend*. Ze kan op elk moment kosteloos opzeggen met 3 weken termijn (art. 4.3).
+- BasicFlex Online heeft *géén telefonische helpdesk*. Voor Jacqueline (88j) is dat onveilig als wij het niet digitaal beheren.
+
+3. *VOORSCHOT WAARSCHUWING (€92 vs €125)*
+Het huidig voorschot van €92/mnd stamt uit de periode met lage beursprijzen. De beursindex is verdubbeld. Blijven op €92/mnd betekent in juni 2027 een *schokfactuur van ~€400 nabetaling*.
+👉 Actie indien bij Luminus: Voorschot per direct optrekken naar €125/mnd!
+
+4. *COMMERCIËLE KEUZE (indien geen Sociaal Tarief)*
+*ENGIE Easy Vast (12m)*: Vaste prijsgarantie + telefonische klantendienst.
+- Mét eDeal welkomstkorting: ~€1.368/jr (goedkoper dan Luminus!).
+- Zonder korting: ~€1.616/jr (~€10/mnd verzekeringspremie tegen winterpieken).
+
+Bekijk het volledige dossier en meterhistoriek op: https://bomma.heselmans.com`;
+
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  };
 
   return (
     <div className="space-y-6">
@@ -81,14 +114,74 @@ export default function BommaTessenderloView({ data }) {
             <span className="text-xs text-slate-300">
               (€47 stroom + €45 gas bij Luminus)
             </span>
-            <div className="mt-2 text-[11px] font-bold text-emerald-300 bg-emerald-950/60 px-3 py-1 rounded-lg border border-emerald-500/30">
-              Vorige Afrekening: €73,30 tegoed ontvangen
+            <div className="mt-2 text-[11px] font-bold text-amber-300 bg-amber-950/80 px-3 py-1 rounded-lg border border-amber-500/40">
+              ⚠️ Reële energiekost nu ~€125/mnd!
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. LUMINUS WIJZIGING 11.01.2027 ALARM */}
+      {/* QUICK ACTIONS BAR VOOR DE BROERS */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-900/80 border border-slate-800 shadow-md">
+        <div className="flex items-center gap-2 text-xs text-slate-300">
+          <HeartHandshake className="w-4 h-4 text-amber-400" />
+          <span>Familiedossier Jacqueline Macours voor Kristof, Alain en Francis</span>
+        </div>
+        <button
+          onClick={handleCopyFamilySummary}
+          className="flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-md"
+        >
+          {copied ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+          <span>{copied ? 'Samenvatting Gekopieerd!' : 'Kopieer Familiebericht voor WhatsApp'}</span>
+        </button>
+      </div>
+
+      {/* PRIORITEIT #1: SOCIAAL TARIEF CHECK */}
+      <div className="rounded-2xl bg-gradient-to-br from-amber-950/70 via-slate-900 to-amber-950/40 border-2 border-amber-500/60 p-6 sm:p-7 shadow-2xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-amber-800/40">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
+              <Crown className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
+                Prioriteit #1 voor de Familie: Controleer het Sociaal Tarief
+              </h3>
+              <p className="text-xs text-amber-200">
+                Mogelijke besparing van ruim <strong className="text-white font-bold">&gt; € 740 per jaar</strong> (jaarkost zakt naar ± € 745 all-in voor stroom én gas).
+              </p>
+            </div>
+          </div>
+          <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
+            Hoogste Besparingshefboom
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1 text-xs">
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-amber-900/40 space-y-1.5">
+            <span className="font-bold text-amber-300 block">1. Wie Heeft Recht?</span>
+            <p className="text-slate-300 leading-relaxed">
+              Senioren die een <strong>IGO</strong> (Inkomensgarantie voor Ouderen), <strong>GRAPA</strong> of een <strong>Verhoogde Tegemoetkoming (BIM)</strong> ontvangen via de Federale Pensioendienst of het ziekenfonds.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-amber-900/40 space-y-1.5">
+            <span className="font-bold text-amber-300 block">2. Hoe Controleren (Alain / Francis / Kristof)?</span>
+            <p className="text-slate-300 leading-relaxed">
+              Kijk Jacqueline haar recentste <strong>pensioenfiche</strong> of bankrekening na op de vermelding &apos;IGO&apos;, &apos;GRAPA&apos; of een specifieke toeslag. Kijk ook of er op de huidige Luminus-factuur al &apos;Sociaal Tarief&apos; vermeld staat.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-amber-900/40 space-y-1.5">
+            <span className="font-bold text-amber-300 block">3. Hoe Activeren?</span>
+            <p className="text-slate-300 leading-relaxed">
+              Staat het niet op de factuur maar geniet ze wel een statuut? Vraag het attest op via <em>MyPension.be</em> of het OCMW/Pensioendienst en bezorg het aan Luminus. Toekenning gebeurt per kwartaal.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. LUMINUS WIJZIGING 11.01.2027 REALITY CHECK */}
       <div className="rounded-2xl bg-rose-950/30 border border-rose-600/40 p-6 sm:p-7 shadow-xl space-y-4">
         <div className="flex items-center gap-3 pb-3 border-b border-rose-800/40">
           <div className="p-2.5 rounded-xl bg-rose-500/20 text-rose-400">
@@ -96,10 +189,10 @@ export default function BommaTessenderloView({ data }) {
           </div>
           <div>
             <h3 className="text-lg font-black text-white">
-              Aangekondigde Wijziging Luminus per 11.01.2027: Risico voor Senior
+              Aangekondigde Wijziging Luminus per 11.01.2027: Feiten &amp; Geruststelling
             </h3>
             <p className="text-xs text-rose-200">
-              Luminus zet het huidige contract van onbepaalde duur eenzijdig om naar een 2-jarig vastgeketend contract (bepaalde duur tot 11.01.2029).
+              Luminus kondigt een omzetting naar 2 jaar aan. Hier zijn de feiten, de risico&apos;s en de wettelijke consumentenbescherming.
             </p>
           </div>
         </div>
@@ -111,37 +204,37 @@ export default function BommaTessenderloView({ data }) {
               100% Digitaal Product
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              <strong>Geen telefonisch contact mogelijk.</strong> Jacqueline (88j) kan bij vragen of problemen niet bellen en moet alles via MyLuminus regelen.
+              <strong>Geen telefonisch contact mogelijk.</strong> Jacqueline (88j) kan bij vragen of problemen niet bellen en moet alles via MyLuminus regelen. Onveilig zonder familiebeheer.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-950/80 border border-rose-900/50 space-y-1.5">
-            <div className="flex items-center gap-2 text-xs font-bold text-rose-300">
-              <Lock className="w-4 h-4 text-rose-400" />
-              2 Jaar Vastgeketend
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-emerald-900/50 space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              Wettelijk Géén Lock-in!
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Het contract wordt omgezet naar <strong>bepaalde duur tot 11.01.2029</strong>. Zonder tijdige opzegging zit ze 24 maanden vast aan hun voorwaarden.
+              Luminus spreekt over &apos;2 jaar vast&apos;, maar de wet beschermt consumenten: zij kan op <strong>elk moment kosteloos vertrekken met 3 weken opzegtermijn</strong> (art. 4.3). Geen paniek voor 6 december!
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-950/80 border border-rose-900/50 space-y-1.5">
-            <div className="flex items-center gap-2 text-xs font-bold text-rose-300">
-              <TrendingDown className="w-4 h-4 text-rose-400" />
-              Vaste Vergoeding Stijgt
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-amber-900/50 space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
+              <AlertTriangle className="w-4 h-4 text-amber-400" />
+              Voorschot-Valkuil: Opleg Dreigt
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Vaste beheerskost stijgt van €21,20 naar <strong>€25,00/jr</strong> (+18%) voor stroom en van €15,90 naar <strong>€20,00/jr</strong> (+26%) voor gas.
+              Door de gestegen gas/stroombeurs kost het contract nu ~€1.485/jr. Blijven op €92/mnd stuurt aan op <strong>~€400 nabetaling in juni 2027</strong>! Verhoog direct naar €125/mnd.
             </p>
           </div>
 
           <div className="p-4 rounded-xl bg-slate-950/80 border border-rose-900/50 space-y-1.5">
             <div className="flex items-center gap-2 text-xs font-bold text-rose-300">
               <Flame className="w-4 h-4 text-rose-400" />
-              Variabel Marktrisico
+              Variabel Beurstarief
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Nieuwe formule (Belpex M / TTF) volgt maandelijkse marktprijzen. Piekstroom stijgt direct naar <strong>€0,268/kWh</strong> (+12,4%).
+              Nieuwe formule volgt Belpex M / TTF. Piekstroom stijgt naar <strong>€0,268/kWh</strong>. Risico op fors hogere facturen bij strenge vrieskoude.
             </p>
           </div>
         </div>
@@ -175,23 +268,36 @@ export default function BommaTessenderloView({ data }) {
         {/* Contract Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {contracts.map((c) => {
-            const isTop = c.is_recommended;
+            const isAmber = c.badge_color === 'amber';
+            const isEmerald = c.badge_color === 'emerald';
+            const isRose = c.badge_color === 'rose';
+
+            let cardBg = 'bg-slate-950/60 border border-slate-800';
+            let badgeBg = 'bg-slate-800 text-slate-300 border-slate-700';
+            let buttonBg = 'bg-slate-800/80 text-slate-400 border-slate-700';
+
+            if (isAmber) {
+              cardBg = 'bg-gradient-to-b from-amber-950/60 to-slate-950 border-2 border-amber-500/70 shadow-2xl shadow-amber-950/40';
+              badgeBg = 'bg-amber-500/20 text-amber-300 border-amber-500/50';
+              buttonBg = 'bg-amber-600 hover:bg-amber-500 text-white border-amber-500 cursor-pointer shadow-lg shadow-amber-950/40';
+            } else if (isEmerald) {
+              cardBg = 'bg-gradient-to-b from-emerald-950/60 to-slate-950 border-2 border-emerald-500/60 shadow-2xl shadow-emerald-950/40';
+              badgeBg = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+              buttonBg = 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 cursor-pointer shadow-lg shadow-emerald-950/40';
+            } else if (isRose) {
+              cardBg = 'bg-slate-950/60 border border-rose-900/60';
+              badgeBg = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+              buttonBg = 'bg-slate-800 text-amber-300 border-amber-500/40';
+            }
+
             return (
               <div 
                 key={c.id}
-                className={`rounded-2xl p-6 transition relative flex flex-col justify-between ${
-                  isTop 
-                    ? 'bg-gradient-to-b from-emerald-950/60 to-slate-950 border-2 border-emerald-500/60 shadow-2xl shadow-emerald-950/40' 
-                    : 'bg-slate-950/60 border border-slate-800'
-                }`}
+                className={`rounded-2xl p-6 transition relative flex flex-col justify-between ${cardBg}`}
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className={`text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full border ${
-                      isTop 
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' 
-                        : 'bg-slate-800 text-slate-300 border-slate-700'
-                    }`}>
+                    <span className={`text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full border ${badgeBg}`}>
                       {c.badge}
                     </span>
                     <span className="text-xs font-bold text-slate-400">
@@ -209,7 +315,7 @@ export default function BommaTessenderloView({ data }) {
                   <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800/80 mb-4 space-y-2">
                     <div className="flex justify-between items-baseline">
                       <span className="text-xs text-slate-400">Netto Jaarkost:</span>
-                      <span className={`text-2xl font-black ${isTop ? 'text-emerald-400' : 'text-slate-100'}`}>
+                      <span className={`text-2xl font-black ${isAmber ? 'text-amber-400' : isEmerald ? 'text-emerald-400' : 'text-slate-100'}`}>
                         €{c.net_annual_total_eur}
                       </span>
                     </div>
@@ -243,11 +349,7 @@ export default function BommaTessenderloView({ data }) {
                 </div>
 
                 <div className="pt-3 border-t border-slate-800/80">
-                  <span className={`block text-center text-xs font-bold py-2 rounded-xl border ${
-                    isTop 
-                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 cursor-pointer shadow-lg shadow-emerald-950/40' 
-                      : 'bg-slate-800/80 text-slate-400 border-slate-700'
-                  }`}>
+                  <span className={`block text-center text-xs font-bold py-2 rounded-xl border ${buttonBg}`}>
                     {c.action_status}
                   </span>
                 </div>
@@ -263,14 +365,14 @@ export default function BommaTessenderloView({ data }) {
           </div>
           <div className="space-y-1.5 text-xs text-slate-300 leading-relaxed">
             <h4 className="text-sm font-bold text-indigo-200">
-              Belangrijke Geruststelling voor Jacqueline: Waarom toont de ENGIE simulatie € 114 / maand?
+              Belangrijke Geruststelling voor Jacqueline &amp; Familie: De Voorschotten bij ENGIE
             </h4>
             <p>
               In het gedownloade voorstel van ENGIE staat een voorschot van <strong>€ 114,02 per maand</strong>. 
-              Dit kan schrikken zijn omdat ze nu € 92 betaalt. Maar: ENGIE hanteert een conservatieve veiligheidsbuffer en verrekent de welkomstkorting van <strong>- € 356,95 pas op de jaarafrekening</strong>.
+              Dit kan schrikken zijn omdat ze nu € 92 betaalt. Maar: ENGIE hanteert een conservatieve veiligheidsbuffer en verrekent de eDeal welkomstkorting van <strong>- € 248 pas op de jaarafrekening</strong>.
             </p>
             <p className="text-indigo-300">
-              👉 <strong>Netto werkelijkheid:</strong> Over het hele jaar kost ENGIE haar slechts <strong>~€ 70 per maand</strong>. Het verschil van € 44/mnd krijgt ze na 1 jaar in één keer teruggestort op haar rekening.
+              👉 <strong>Netto werkelijkheid:</strong> Met welkomstkorting kost ENGIE haar circa <strong>€ 1.368/jaar</strong> (goedkoper dan Luminus). Zonder welkomstkorting is het € 1.616/jaar (~€ 10/mnd meer dan Luminus, maar als veilige verzekering met telefonische helpdesk).
             </p>
           </div>
         </div>

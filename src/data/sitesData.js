@@ -108,160 +108,160 @@ export const BOMMA_TESSENDERLO_DATA = {
     settlement_credit_eur: -73.30,
     elec_cost_eur: 529.26,
     gas_cost_eur: 437.44,
-    status_note: 'Luminus heeft eenzijdige contractwijziging aangekondigd per 11.01.2027'
+    status_note: 'Luminus heeft contractwijziging aangekondigd per 11.01.2027. Huidig voorschot van €92/mnd is te laag voor de huidige winterbeurs.'
   },
   proposed_renewal: {
     provider: 'Luminus',
     name: 'BasicFlex Online (Nieuw Voorstel)',
-    type: 'Variabel (Bepaalde duur 2 JAAR VAST)',
+    type: 'Variabel (Formeel 2 jaar, maar wettelijk altijd opzegbaar met 3 wkn)',
     effective_date: '11.01.2027',
-    lock_period: '2 jaar (11.01.2027 tot 11.01.2029)',
+    lock_period: 'Geen lock-in: wettelijk op elk moment kosteloos opzegbaar met 3 weken termijn',
     elec_fixed_eur: 25.00, // +18%
     gas_fixed_eur: 20.00,  // +26%
     elec_day_formula: '0,0012353 * Belpex M + 0,0387312 (~€0,26789/kWh)',
     elec_night_formula: '0,0009653 * Belpex M + 0,0324576 (~€0,21166/kWh)',
-    projected_annual_total_eur: 1120.00,
-    projected_monthly_advance_eur: 93.30,
+    projected_annual_total_eur: 1485.00,
+    projected_monthly_advance_eur: 125.00,
     warnings: [
       '100% Digitale Dienstverlening: GEEN telefonische helpdesk mogelijk (ongeschikt voor Jacqueline)',
-      'Contractuele binding van 2 jaar (bepaalde duur): zit 24 maanden vast',
-      'Variabel tarief: risico op prijspieken tijdens strenge wintermaanden',
-      'Vaste jaarvergoedingen stijgen (+18% elektriciteit, +26% aardgas)'
+      'Huidig voorschot (€92/mnd) stuurt aan op een nabetaling van ~€400 in juni 2027: dringend verhogen naar €125/mnd',
+      'Variabel markttarief (Belpex M / TTF): risico op forse pieken tijdens koude wintermaanden',
+      'Wettelijke geruststelling: 6 december is geen fatale datum. Particulieren kunnen in België te allen tijde gratis overstappen met 3 weken opzegtermijn'
     ]
   },
   market_audit: {
     title: "Senioren Energie Audit: Bomma Tessenderlo",
-    verdict: "Het Luminus-voorstel per 11.01.2027 is 100% digitaal zonder telefonische support en bindt Jacqueline 2 jaar vast aan volatiele marktprijzen. ENGIE Easy Vast biedt voor haar maximale gemoedsrust met vaste prijzen en telefonische helpdesk.",
+    verdict: "Absolute prioriteit #1 is het sociaal tarief via IGO/BIM (bespaart ruim €740/jaar). Zonder sociaal tarief biedt ENGIE Easy Vast de veiligste haven met telefonische service en vaste prijzen. Blijft ze bij Luminus, dan moet het voorschot direct naar €125/mnd.",
     mechanics: [
       {
-        title: "1. Telefonische Bereikbaarheid (Senior Factor)",
-        icon: "PhoneCall",
-        desc: "Jacqueline (88j) heeft niets aan een webportal of smartphone-app. Luminus BasicFlex Online sluit telefonisch contact expliciet uit. ENGIE Easy Vast behoudt een volwaardige telefonische klantendienst."
+        title: "1. Prioriteit #1: Sociaal Tarief Check (Besparing > €740/jr)",
+        icon: "HeartHandshake",
+        desc: "Als Jacqueline (88j) IGO, GRAPA of een verhoogde tegemoetkoming (BIM) geniet via haar pensioen, zakt haar energiekost naar ± €745/jaar all-in (€0 distributiekosten, geen capaciteitstarief). Dit moet eerst gecontroleerd worden op haar pensioenfiche."
       },
       {
-        title: "2. Geen Winterprijsschokken (Vast vs Variabel)",
+        title: "2. Geen Lock-in: Opzegbaar op Elk Moment met 3 Weken",
         icon: "ShieldCheck",
-        desc: "Met een gasverbruik van 5.613 kWh en 1.535 kWh stroom is een vaste prijsformule ideaal: haar maandkost blijft 12 maanden exact gelijk, ongeacht geopolitieke of gasmarktcrisissen."
+        desc: "Hoewel Luminus spreekt over een 'contract van 2 jaar' en een bedenktijd van 1 maand tot 6 december, is een particuliere consument in België NOOIT vastgeketend. Je kan wettelijk op elk moment kosteloos vertrekken met 3 weken opzegtermijn."
       },
       {
-        title: "3. De Voorschottenverwarring (€114 vs €70)",
-        icon: "Info",
-        desc: "Op de website van ENGIE staat een voorlopig voorschot van €114/mnd. Dit komt omdat ENGIE de welkomstkorting (-€356) pas verrekent op de jaarafrekening. Netto kost het contract haar ~€70 à €72/mnd."
+        title: "3. Voorschotten-Valkuil: Verhoog naar €125 / maand",
+        icon: "AlertTriangle",
+        desc: "Door de gestegen groothandelsprijzen (Belpex index van €87 naar €174/MWh) kost haar verbruik bij Luminus nu circa €1.485/jaar. Huidig voorschot van €92/mnd (€1.104/jr) zorgt voor een schokfactuur van ~€400 in juni 2027 indien dit niet naar €125/mnd wordt aangepast."
       },
       {
-        title: "4. Minimale Capaciteitspiek (Geen Zorgen)",
-        icon: "Zap",
-        desc: "Haar werkelijke maandpiek schommelt rond 2,66 - 2,96 kW. Ze zit praktisch op de Vlaamse minimumdrempel van 2,5 kW. Geen nood aan complexe batterij- of sturingssystemen."
+        title: "4. Telefonische Bereikbaarheid (Senior Factor)",
+        icon: "PhoneCall",
+        desc: "Jacqueline kan niets aanvangen met webportalen of apps. Luminus BasicFlex Online sluit telefonisch contact expliciet uit. ENGIE Easy Vast behoudt een volwaardige telefonische klantendienst."
       }
     ],
     benchmark_table: [
       {
         rank: 1,
-        name: "ENGIE Easy Vast (12 Maanden)",
-        category: "🏆 HEMS Senioren Keuze #1 (Vast + Telefoon)",
-        source: "Mijnenergie.be eDeal Actie",
-        annual_cost_eur: 845.00,
-        monthly_cost_eur: 70.42,
-        saving_vs_luminus: 275.00,
-        welcome_bonus_eur: 356.95,
+        name: "Sociaal Tarief (CreG / Federale Overheid)",
+        category: "👑 Absolute Prioriteit (Indien IGO / BIM)",
+        source: "Federale Prijsregulering Q4",
+        annual_cost_eur: 745.00,
+        monthly_cost_eur: 62.08,
+        saving_vs_luminus: 740.00,
+        welcome_bonus_eur: 0,
         fixed_price: true,
         phone_support: true,
-        senior_score: "9.8 / 10",
-        details: "100% vaste prijs voor 12 maanden + telefonische helpdesk. Netto €70/mnd na korting. Bruto voorschot op factuur is €114/mnd met teruggave op jaarafrekening."
+        senior_score: "10 / 10",
+        details: "Wettelijk geplafonneerd tarief. Geen distributiekosten en geen capaciteitstarief. Aanvragen via attest pensioendienst/OCMW indien niet automatisch actief."
       },
       {
         rank: 2,
-        name: "TotalEnergies Pixel Vast (12 Maanden)",
-        category: "🥈 Alternatief Vast Contract",
-        source: "Vergelijker eDeal",
-        annual_cost_eur: 882.00,
-        monthly_cost_eur: 73.50,
-        saving_vs_luminus: 238.00,
-        welcome_bonus_eur: 280.00,
+        name: "ENGIE Easy Vast (12 Maanden)",
+        category: "🏆 #1 Commerciële Keuze (Vast + Telefoon)",
+        source: "Mijnenergie.be / ENGIE",
+        annual_cost_eur: 1368.00,
+        monthly_cost_eur: 114.00,
+        saving_vs_luminus: 117.00,
+        welcome_bonus_eur: 248.00,
         fixed_price: true,
         phone_support: true,
-        senior_score: "9.0 / 10",
-        details: "Vaste prijsgarantie en telefonische helpdesk. Iets minder korting dan ENGIE maar stabiele en betrouwbare service."
+        senior_score: "9.8 / 10",
+        details: "100% vaste prijs voor 12 maanden + telefonische helpdesk. Met welkomstkorting €1.368/jr; zonder korting €1.616/jr (~€10/mnd meer dan Luminus als verzekering tegen winterpieken). Gerekend met echte piek van 2,96 kW."
       },
       {
         rank: 3,
         name: "Luminus BasicFlex Online (Voorstel 11.01.2027)",
-        category: "⚠️ Huidig Voorstel Luminus (Niet Aangeraden)",
+        category: "⚠️ Huidig Voorstel (Niet Aangeraden)",
         source: "Luminus E-mail 06.11.2026",
-        annual_cost_eur: 1120.00,
-        monthly_cost_eur: 93.33,
+        annual_cost_eur: 1485.00,
+        monthly_cost_eur: 123.75,
         saving_vs_luminus: 0,
         welcome_bonus_eur: 0,
         fixed_price: false,
         phone_support: false,
         senior_score: "4.5 / 10",
-        details: "2 jaar vastgeketend, variabel markttarief, stijgende vaste vergoeding en GEEN telefonische helpdesk."
+        details: "Variabel beurstarief zonder telefonische helpdesk. Voorschot moet direct naar €125/mnd. Wel op elk moment kosteloos opzegbaar met 3 weken termijn."
       }
     ]
   },
   contracts: [
     {
+      id: 'sociaal_tarief_bomma',
+      provider: 'Federale Overheid / CREG',
+      name: 'Sociaal Tarief (Indien IGO / BIM)',
+      badge: '👑 #1 Absolute Hefboom',
+      badge_color: 'amber',
+      type: 'Geplafonneerd Tarief',
+      formula_elec: '25,66 - 26,85 c€/kWh (€0 nettarieven)',
+      formula_gas: '6,08 c€/kWh (geen toeslagen)',
+      inj_rate_c_kwh: 0,
+      fixed_fee_annual_eur: 0,
+      elec_cost_eur: 405,
+      gas_cost_eur: 340,
+      inj_credit_eur: 0,
+      net_annual_total_eur: 745.00,
+      delta_vs_current_eur: 740.00,
+      delta_pct: 49.8,
+      is_recommended: true,
+      action_status: 'Prioriteit 1: Check Pensioenfiche',
+      highlight: 'Als Jacqueline IGO, GRAPA of BIM geniet, zakt haar energiekost naar €745/jr. Controleer haar pensioenattest en bezorg dit aan de leverancier!'
+    },
+    {
       id: 'engie_easy_vast_bomma',
       provider: 'ENGIE',
       name: 'ENGIE Easy Vast (12m)',
-      badge: '🏆 #1 Senioren Keuze',
+      badge: '🏆 Beste Commerciële Keuze',
       badge_color: 'emerald',
       type: 'Vast Tarief (1 Jaar)',
       formula_elec: 'Vaste prijs 12m + telefonische support',
-      formula_gas: 'Vaste prijs 12m (-€356 Mijnenergie korting)',
+      formula_gas: 'Vaste prijs 12m (met welkomstbonus)',
       inj_rate_c_kwh: 0,
       fixed_fee_annual_eur: 70,
-      elec_cost_eur: 395,
-      gas_cost_eur: 450,
+      elec_cost_eur: 650,
+      gas_cost_eur: 718,
       inj_credit_eur: 0,
-      net_annual_total_eur: 845.00,
-      delta_vs_current_eur: 275.00,
-      delta_pct: 24.5,
-      is_recommended: true,
-      action_status: 'Aanbevolen Switch (Senioren Vriendelijk)',
-      highlight: 'Vaste prijszekerheid, telefonische support en netto besparing van €275 t.o.v. het nieuwe Luminus voorstel!'
-    },
-    {
-      id: 'total_pixel_vast_bomma',
-      provider: 'TotalEnergies',
-      name: 'Pixel Vast (12m)',
-      badge: '🥈 Veilig Alternatief',
-      badge_color: 'blue',
-      type: 'Vast Tarief (1 Jaar)',
-      formula_elec: 'Pixel Vast 12m met telefoon',
-      formula_gas: 'Pixel Vast Gas met telefoon',
-      inj_rate_c_kwh: 0,
-      fixed_fee_annual_eur: 75,
-      elec_cost_eur: 412,
-      gas_cost_eur: 470,
-      inj_credit_eur: 0,
-      net_annual_total_eur: 882.00,
-      delta_vs_current_eur: 238.00,
-      delta_pct: 21.2,
+      net_annual_total_eur: 1368.00,
+      delta_vs_current_eur: 117.00,
+      delta_pct: 7.9,
       is_recommended: false,
-      action_status: 'Goed Alternatief',
-      highlight: 'Vaste prijs voor 12 maanden met telefonische bereikbaarheid voor senioren.'
+      action_status: 'Beste Commerciële Switch',
+      highlight: '100% vaste prijs en telefonische klantendienst. €1.368/jr mét eDeal welkomstkorting; €1.616/jr zonder korting (exact berekend op 2,96 kW piek).'
     },
     {
       id: 'luminus_basicflex_proposed',
       provider: 'Luminus',
-      name: 'BasicFlex Online (Voorstel)',
-      badge: '⚠️ Huidig Voorstel 11.01.2027',
-      badge_color: 'amber',
-      type: 'Variabel (2 Jaar Vastgeketend)',
+      name: 'BasicFlex Online (Voorstel 11.01.2027)',
+      badge: '⚠️ Huidig Voorstel',
+      badge_color: 'rose',
+      type: 'Variabel (Altijd 3 wkn opzegbaar)',
       formula_elec: '0,0012353 * Belpex M + 0,03873 (€0,268/kWh)',
       formula_gas: 'TTF variabel + €20 vast',
       inj_rate_c_kwh: 0,
       fixed_fee_annual_eur: 45,
-      elec_cost_eur: 580,
-      gas_cost_eur: 540,
+      elec_cost_eur: 735,
+      gas_cost_eur: 750,
       inj_credit_eur: 0,
-      net_annual_total_eur: 1120.00,
+      net_annual_total_eur: 1485.00,
       delta_vs_current_eur: 0,
       delta_pct: 0,
       is_current: true,
-      action_status: 'Niet Aangeraden',
-      highlight: 'Geen telefonische helpdesk mogelijk en 2 jaar vastgepind op variabele marktprijzen.'
+      action_status: 'Voorschot naar €125/mnd!',
+      highlight: 'Geen telefonische helpdesk. Reële jaarkost schommelt rond €1.485. Voorschot moet direct naar €125/mnd om €400 opleg in juni 2027 te vermijden. Geen 2-jaars lock-in: altijd opzegbaar met 3 wkn.'
     }
   ],
   monthly_breakdown: [
@@ -281,21 +281,27 @@ export const BOMMA_TESSENDERLO_DATA = {
   action_plan: [
     {
       step: 1,
-      title: "Mandaat Fluvius Koppelen",
-      status: "Actie Kristof",
-      desc: "Log in op mijn.fluvius.be en vraag digitaal mandaat / toegang aan voor EAN 541449206002948378 (stroom) en 541449206007458049 (gas)."
+      title: "Controleer Sociaal Tarief (IGO/GRAPA/BIM)",
+      status: "Prioriteit #1",
+      desc: "Kijk Jacqueline haar pensioenfiche of bankrekening na: ontvangt zij IGO, GRAPA of Verhoogde Tegemoetkoming? Zo ja: bezorg het attest aan Luminus (besparing: > €740/jaar, jaarkost wordt €745)."
     },
     {
       step: 2,
-      title: "Kies ENGIE Easy Vast (1 Jaar)",
-      status: "Aanbeveling",
-      desc: "Schakel over vóór medio december 2026 zodat de switch naadloos ingaat vóór de Luminus 2-jaars lock-in op 11.01.2027."
+      title: "Kies ENGIE Easy Vast (indien geen Sociaal Tarief)",
+      status: "Aanbevolen Switch",
+      desc: "Biedt vaste prijszekerheid en telefonische ondersteuning voor senior. Vraag telefonisch of via Mijnenergie/Aanbieders.be naar de welkomstkorting (-€248) voor een jaarkost van €1.368."
     },
     {
       step: 3,
-      title: "Naamscorrectie & Contactpersoon",
+      title: "Bij Luminus Blijven? Voorschot naar €125/mnd",
+      status: "Onmiddellijke Actie",
+      desc: "Huidig voorschot van €92/mnd dekt de huidige marktprijzen niet. Verhoog direct via MyLuminus of telefonisch naar €125/mnd om €400 schokfactuur in juni 2027 te vermijden."
+    },
+    {
+      step: 4,
+      title: "Fluvius Mandaat & Naamscorrectie",
       status: "Administratie",
-      desc: "Luminus adresseert momenteel verkeerd aan 'heer Macours'. Zet Kristof Heselmans als gemachtigd contactpersoon of zet de tenaamstelling correct op 'Mevr. Jacqueline Macours'."
+      desc: "Zet Kristof/broers als gemachtigde via mijn.fluvius.be voor EAN 541449206002948378 en 541449206007458049, en corrigeer aanspreektitel naar Mevr. Jacqueline Macours."
     }
   ],
   two_year_comparison: {
