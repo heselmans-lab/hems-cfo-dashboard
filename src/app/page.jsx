@@ -117,12 +117,10 @@ export default function CFODashboard() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const requestedSite = urlParams.get('site');
-    if (requestedSite) {
-      setSelectedSite(requestedSite);
-      fetchData(requestedSite);
-    } else {
-      fetchData();
-    }
+    const isBommaHost = typeof window !== 'undefined' && window.location.hostname.includes('bomma.');
+    const initialSite = requestedSite || (isBommaHost ? 'bomma_tessenderlo' : 'kruisstraat');
+    setSelectedSite(initialSite);
+    fetchData(initialSite);
   }, []);
 
   // Recalculate market contracts dynamically based on simulator sliders

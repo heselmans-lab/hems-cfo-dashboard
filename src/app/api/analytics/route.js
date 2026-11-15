@@ -28,10 +28,12 @@ export async function GET(request) {
       }, { status: 401 });
     }
 
+    const host = request.headers.get('host') || '';
+    const isBommaHost = host.includes('bomma.');
     const { searchParams } = new URL(request.url);
     let siteParam = searchParams.get('site');
     if (!siteParam) {
-      siteParam = userRole === 'admin' ? 'kruisstraat' : 'bomma_tessenderlo';
+      siteParam = (isBommaHost || userRole !== 'admin') ? 'bomma_tessenderlo' : 'kruisstraat';
     }
 
     // Strict role check: if requested site is not permitted for this user, deny access
