@@ -45,27 +45,32 @@ export default function BommaTessenderloView({ data }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyFamilySummary = () => {
-    const text = `*Energieadvies Bomma (Jacqueline Macours - Tessenderlo)*
+    const text = `*Energiedossier Bomma (Jacqueline - Tessenderlo)*
 Weblink: https://bomma.heselmans.com
 
-1. *PRIORITEIT #1: SOCIAAL TARIEF (Besparing > €740/jaar)*
-Ontvangt Jacqueline IGO, GRAPA of een verhoogde tegemoetkoming (BIM)? Dan zakt haar totale jaarkost van ~€1.500 naar *slechts ± €745 all-in*!
-👉 Actie: Controleer haar recentste pensioenfiche. Staat het niet op haar Luminus-factuur, bezorg dan het attest van de pensioendienst/OCMW aan Luminus.
+Dag mannen, hierbij de analyse van de Luminus-brief voor Bomma:
 
-2. *LUMINUS WIJZIGING (11.01.2027) & JURIDISCHE GERUSTSTELLING*
-- Geen paniek: Hoewel Luminus spreekt over een contract van 2 jaar en weigering voor 6 december, is een particulier in België *wettelijk NOOIT vastgeketend*. Ze kan op elk moment kosteloos opzeggen met 3 weken termijn (art. 4.3).
-- BasicFlex Online heeft *géén telefonische helpdesk*. Voor Jacqueline (88j) is dat onveilig als wij het niet digitaal beheren.
+1. *GEEN PANIEK OVER DE 2 JAAR OF 6 DECEMBER*
+Luminus noemt het een contract van 2 jaar en vraagt reactie voor 6 december. Maar volgens de Belgische energiewet kan een consument *te allen tijde kosteloos overstappen met 3 weken opzegtermijn*. Ze zit nergens aan vast.
 
-3. *VOORSCHOT WAARSCHUWING (€92 vs €125)*
-Het huidig voorschot van €92/mnd stamt uit de periode met lage beursprijzen. De beursindex is verdubbeld. Blijven op €92/mnd betekent in juni 2027 een *schokfactuur van ~€400 nabetaling*.
-👉 Actie indien bij Luminus: Voorschot per direct optrekken naar €125/mnd!
+2. *HUIDIG LUMINUS VOORSCHOT IS TE LAAG (€92 vs €125)*
+Het voorschot van €92/mnd stamt uit de periode met lage gasprijzen. Blijft ze bij Luminus op dit tarief, dan volgt in juni 2027 een *nabetaling van circa €400*. Het voorschot moet direct naar *€125/mnd* als we bij Luminus blijven.
+Bovendien heeft dit BasicFlex-contract *geen telefonische helpdesk* (enkel digitaal).
 
-4. *COMMERCIËLE KEUZE (indien geen Sociaal Tarief)*
-*ENGIE Easy Vast (12m)*: Vaste prijsgarantie + telefonische klantendienst.
-- Mét eDeal welkomstkorting: ~€1.368/jr (goedkoper dan Luminus!).
-- Zonder korting: ~€1.616/jr (~€10/mnd verzekeringspremie tegen winterpieken).
+3. *AANBEVOLEN OPLOSSING: ENGIE EASY VAST (1 JAAR)*
+Voor Bomma (88j) is *ENGIE Easy Vast* de verstandigste keuze:
+- 100% vaste prijs voor 12 maanden (geen winterpieken of marktcrisissen).
+- Volwaardige telefonische klantendienst.
+- Kostprijs: mét welkomstkorting ~€1.368/jr (goedkoper dan Luminus!); zonder korting ~€1.616/jr (~€10/mnd meer dan Luminus, maar als veilige verzekering).
 
-Bekijk het volledige dossier en meterhistoriek op: https://bomma.heselmans.com`;
+4. *SNELLE CHECK: PENSIOENFICHE (SOCIAAL TARIEF)*
+De kans is waarschijnlijk klein dat ze er recht op heeft, maar het is verstandig om haar recentste pensioenfiche even te checken op IGO / GRAPA of Verhoogde Tegemoetkoming (BIM) om dit formeel uit te sluiten. (Als ze het toch heeft, zakt de rekening naar €745/jr).
+
+👉 *Voorstel stappen:*
+1. Pensioenfiche even scannen/nakijken om sociaal tarief uit te sluiten.
+2. Zo niet: switch naar ENGIE Easy Vast met telefonische support en vaste prijs.
+
+Alles staat overzichtelijk met de meterstanden op: https://bomma.heselmans.com`;
 
     navigator.clipboard.writeText(text);
     setCopied(true);
@@ -136,47 +141,61 @@ Bekijk het volledige dossier en meterhistoriek op: https://bomma.heselmans.com`;
         </button>
       </div>
 
-      {/* PRIORITEIT #1: SOCIAAL TARIEF CHECK */}
-      <div className="rounded-2xl bg-gradient-to-br from-amber-950/70 via-slate-900 to-amber-950/40 border-2 border-amber-500/60 p-6 sm:p-7 shadow-2xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-amber-800/40">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400">
-              <Crown className="w-6 h-6" />
+      {/* AANBEVOLEN STRATEGIE & SANITY CHECK */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Hoofdaanbeveling: ENGIE Easy Vast */}
+        <div className="lg:col-span-2 rounded-2xl bg-gradient-to-br from-emerald-950/70 via-slate-900 to-indigo-950/50 border-2 border-emerald-500/60 p-6 sm:p-7 shadow-2xl space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-emerald-800/40">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-white">
+                  Aanbevolen Keuze voor Jacqueline: ENGIE Easy Vast (12 Maanden)
+                </h3>
+                <p className="text-xs text-emerald-200">
+                  100% vaste prijsgarantie tegen winterpieken én een volwaardige telefonische klantendienst.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-black text-white flex items-center gap-2">
-                Prioriteit #1 voor de Familie: Controleer het Sociaal Tarief
-              </h3>
-              <p className="text-xs text-amber-200">
-                Mogelijke besparing van ruim <strong className="text-white font-bold">&gt; € 740 per jaar</strong> (jaarkost zakt naar ± € 745 all-in voor stroom én gas).
+            <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">
+              🏆 Senioren Vriendelijk
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+            <div className="p-3.5 rounded-xl bg-slate-950/80 border border-emerald-900/40 space-y-1">
+              <span className="font-bold text-emerald-300 block">Telefonische Klantendienst</span>
+              <p className="text-slate-300 leading-relaxed">
+                Jacqueline (88j) kan bij vragen gewoon telefonisch contact opnemen met de klantendienst, in tegenstelling tot Luminus BasicFlex Online waar men enkel digitaal kan communiceren.
+              </p>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-950/80 border border-emerald-900/40 space-y-1">
+              <span className="font-bold text-emerald-300 block">Vaste Prijs voor 12 Maanden</span>
+              <p className="text-slate-300 leading-relaxed">
+                Geen blootstelling aan volatiele gasprijzen deze winter. Met welkomstkorting kost dit ~<strong>€ 1.368/jaar</strong>; zonder korting <strong>€ 1.616/jaar</strong> (~€10/mnd verzekeringspremie).
               </p>
             </div>
           </div>
-          <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
-            Hoogste Besparingshefboom
-          </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1 text-xs">
-          <div className="p-4 rounded-xl bg-slate-950/80 border border-amber-900/40 space-y-1.5">
-            <span className="font-bold text-amber-300 block">1. Wie Heeft Recht?</span>
-            <p className="text-slate-300 leading-relaxed">
-              Senioren die een <strong>IGO</strong> (Inkomensgarantie voor Ouderen), <strong>GRAPA</strong> of een <strong>Verhoogde Tegemoetkoming (BIM)</strong> ontvangen via de Federale Pensioendienst of het ziekenfonds.
+        {/* Snelle Sanity Check: Pensioenfiche / Sociaal Tarief */}
+        <div className="rounded-2xl bg-slate-900/90 border border-amber-500/40 p-6 flex flex-col justify-between shadow-xl space-y-3">
+          <div>
+            <div className="flex items-center gap-2 pb-2 border-b border-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-wider">
+              <HeartHandshake className="w-4 h-4 text-amber-400" />
+              <span>Snelle Sanity Check</span>
+            </div>
+            <h4 className="text-base font-black text-white mt-2">
+              Pensioenfiche 1x Nakijken
+            </h4>
+            <p className="text-xs text-slate-300 leading-relaxed mt-2">
+              De kans is waarschijnlijk klein dat ze er recht op heeft, maar het is verstandig om haar recentste <strong>pensioenfiche</strong> even te checken op een vermelding van <strong>IGO / GRAPA</strong> of <strong>BIM</strong> om het sociaal tarief formeel uit te sluiten.
             </p>
           </div>
-
-          <div className="p-4 rounded-xl bg-slate-950/80 border border-amber-900/40 space-y-1.5">
-            <span className="font-bold text-amber-300 block">2. Hoe Controleren (Alain / Francis / Kristof)?</span>
-            <p className="text-slate-300 leading-relaxed">
-              Kijk Jacqueline haar recentste <strong>pensioenfiche</strong> of bankrekening na op de vermelding &apos;IGO&apos;, &apos;GRAPA&apos; of een specifieke toeslag. Kijk ook of er op de huidige Luminus-factuur al &apos;Sociaal Tarief&apos; vermeld staat.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-slate-950/80 border border-amber-900/40 space-y-1.5">
-            <span className="font-bold text-amber-300 block">3. Hoe Activeren?</span>
-            <p className="text-slate-300 leading-relaxed">
-              Staat het niet op de factuur maar geniet ze wel een statuut? Vraag het attest op via <em>MyPension.be</em> of het OCMW/Pensioendienst en bezorg het aan Luminus. Toekenning gebeurt per kwartaal.
-            </p>
+          <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-[11px] text-amber-200 leading-snug">
+            💡 Indien toch van toepassing: energiekost zakt direct naar <strong>± € 745 / jaar</strong> all-in.
           </div>
         </div>
       </div>

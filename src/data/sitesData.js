@@ -131,12 +131,12 @@ export const BOMMA_TESSENDERLO_DATA = {
   },
   market_audit: {
     title: "Senioren Energie Audit: Bomma Tessenderlo",
-    verdict: "Absolute prioriteit #1 is het sociaal tarief via IGO/BIM (bespaart ruim €740/jaar). Zonder sociaal tarief biedt ENGIE Easy Vast de veiligste haven met telefonische service en vaste prijzen. Blijft ze bij Luminus, dan moet het voorschot direct naar €125/mnd.",
+    verdict: "De aanbevolen commerciële keuze is ENGIE Easy Vast: 12 maanden vaste prijszekerheid en telefonische ondersteuning voor Jacqueline (88j). Luminus BasicFlex is variabel en sluit telefonisch contact uit. Wel is het verstandig haar pensioenfiche 1x na te kijken om een eventueel sociaal tarief (IGO/BIM) formeel uit te sluiten.",
     mechanics: [
       {
-        title: "1. Prioriteit #1: Sociaal Tarief Check (Besparing > €740/jr)",
-        icon: "HeartHandshake",
-        desc: "Als Jacqueline (88j) IGO, GRAPA of een verhoogde tegemoetkoming (BIM) geniet via haar pensioen, zakt haar energiekost naar ± €745/jaar all-in (€0 distributiekosten, geen capaciteitstarief). Dit moet eerst gecontroleerd worden op haar pensioenfiche."
+        title: "1. Aanbevolen Keuze: ENGIE Easy Vast (12 Maanden)",
+        icon: "ShieldCheck",
+        desc: "Met 5.613 kWh gas en 1.535 kWh stroom biedt ENGIE Easy Vast de ideale gemoedsrust voor Jacqueline: 100% vaste prijs voor 12 maanden (geen winterprijsschokken) én een volwaardige telefonische klantendienst."
       },
       {
         title: "2. Geen Lock-in: Opzegbaar op Elk Moment met 3 Weken",
@@ -146,33 +146,19 @@ export const BOMMA_TESSENDERLO_DATA = {
       {
         title: "3. Voorschotten-Valkuil: Verhoog naar €125 / maand",
         icon: "AlertTriangle",
-        desc: "Door de gestegen groothandelsprijzen (Belpex index van €87 naar €174/MWh) kost haar verbruik bij Luminus nu circa €1.485/jaar. Huidig voorschot van €92/mnd (€1.104/jr) zorgt voor een schokfactuur van ~€400 in juni 2027 indien dit niet naar €125/mnd wordt aangepast."
+        desc: "Door de gestegen groothandelsprijzen kost haar verbruik bij Luminus nu circa €1.485/jaar. Huidig voorschot van €92/mnd (€1.104/jr) zorgt voor een schokfactuur van ~€400 in juni 2027 indien dit niet naar €125/mnd wordt aangepast."
       },
       {
-        title: "4. Telefonische Bereikbaarheid (Senior Factor)",
-        icon: "PhoneCall",
-        desc: "Jacqueline kan niets aanvangen met webportalen of apps. Luminus BasicFlex Online sluit telefonisch contact expliciet uit. ENGIE Easy Vast behoudt een volwaardige telefonische klantendienst."
+        title: "4. Snelle Sanity Check: Pensioenfiche Nakijken",
+        icon: "HeartHandshake",
+        desc: "De kans is waarschijnlijk klein dat Jacqueline recht heeft op het sociaal tarief, maar het is verstandig om haar recentste pensioenfiche even te scannen op IGO, GRAPA of Verhoogde Tegemoetkoming (BIM) om dit formeel uit te sluiten."
       }
     ],
     benchmark_table: [
       {
         rank: 1,
-        name: "Sociaal Tarief (CreG / Federale Overheid)",
-        category: "👑 Absolute Prioriteit (Indien IGO / BIM)",
-        source: "Federale Prijsregulering Q4",
-        annual_cost_eur: 745.00,
-        monthly_cost_eur: 62.08,
-        saving_vs_luminus: 740.00,
-        welcome_bonus_eur: 0,
-        fixed_price: true,
-        phone_support: true,
-        senior_score: "10 / 10",
-        details: "Wettelijk geplafonneerd tarief. Geen distributiekosten en geen capaciteitstarief. Aanvragen via attest pensioendienst/OCMW indien niet automatisch actief."
-      },
-      {
-        rank: 2,
         name: "ENGIE Easy Vast (12 Maanden)",
-        category: "🏆 #1 Commerciële Keuze (Vast + Telefoon)",
+        category: "🏆 Aanbevolen Keuze voor Jacqueline",
         source: "Mijnenergie.be / ENGIE",
         annual_cost_eur: 1368.00,
         monthly_cost_eur: 114.00,
@@ -181,12 +167,12 @@ export const BOMMA_TESSENDERLO_DATA = {
         fixed_price: true,
         phone_support: true,
         senior_score: "9.8 / 10",
-        details: "100% vaste prijs voor 12 maanden + telefonische helpdesk. Met welkomstkorting €1.368/jr; zonder korting €1.616/jr (~€10/mnd meer dan Luminus als verzekering tegen winterpieken). Gerekend met echte piek van 2,96 kW."
+        details: "100% vaste prijs voor 12 maanden + telefonische helpdesk. Met welkomstkorting €1.368/jr (goedkoper dan Luminus); zonder korting €1.616/jr (~€10/mnd meer dan Luminus als veilige verzekering). Gerekend met echte piek van 2,96 kW."
       },
       {
-        rank: 3,
+        rank: 2,
         name: "Luminus BasicFlex Online (Voorstel 11.01.2027)",
-        category: "⚠️ Huidig Voorstel (Niet Aangeraden)",
+        category: "⚠️ Huidig Voorstel Luminus (Niet Aangeraden)",
         source: "Luminus E-mail 06.11.2026",
         annual_cost_eur: 1485.00,
         monthly_cost_eur: 123.75,
@@ -196,36 +182,29 @@ export const BOMMA_TESSENDERLO_DATA = {
         phone_support: false,
         senior_score: "4.5 / 10",
         details: "Variabel beurstarief zonder telefonische helpdesk. Voorschot moet direct naar €125/mnd. Wel op elk moment kosteloos opzegbaar met 3 weken termijn."
+      },
+      {
+        rank: 3,
+        name: "Sociaal Tarief (CreG / Federale Overheid)",
+        category: "🔍 Te Verifiëren via Pensioenfiche",
+        source: "Federale Prijsregulering Q4",
+        annual_cost_eur: 745.00,
+        monthly_cost_eur: 62.08,
+        saving_vs_luminus: 740.00,
+        welcome_bonus_eur: 0,
+        fixed_price: true,
+        phone_support: true,
+        senior_score: "10 / 10",
+        details: "Wettelijk geplafonneerd tarief. Enkel van toepassing indien Jacqueline IGO/GRAPA/BIM ontvangt. Even controleren op haar pensioenfiche om uit te sluiten."
       }
     ]
   },
   contracts: [
     {
-      id: 'sociaal_tarief_bomma',
-      provider: 'Federale Overheid / CREG',
-      name: 'Sociaal Tarief (Indien IGO / BIM)',
-      badge: '👑 #1 Absolute Hefboom',
-      badge_color: 'amber',
-      type: 'Geplafonneerd Tarief',
-      formula_elec: '25,66 - 26,85 c€/kWh (€0 nettarieven)',
-      formula_gas: '6,08 c€/kWh (geen toeslagen)',
-      inj_rate_c_kwh: 0,
-      fixed_fee_annual_eur: 0,
-      elec_cost_eur: 405,
-      gas_cost_eur: 340,
-      inj_credit_eur: 0,
-      net_annual_total_eur: 745.00,
-      delta_vs_current_eur: 740.00,
-      delta_pct: 49.8,
-      is_recommended: true,
-      action_status: 'Prioriteit 1: Check Pensioenfiche',
-      highlight: 'Als Jacqueline IGO, GRAPA of BIM geniet, zakt haar energiekost naar €745/jr. Controleer haar pensioenattest en bezorg dit aan de leverancier!'
-    },
-    {
       id: 'engie_easy_vast_bomma',
       provider: 'ENGIE',
       name: 'ENGIE Easy Vast (12m)',
-      badge: '🏆 Beste Commerciële Keuze',
+      badge: '🏆 Aanbevolen Keuze',
       badge_color: 'emerald',
       type: 'Vast Tarief (1 Jaar)',
       formula_elec: 'Vaste prijs 12m + telefonische support',
@@ -238,9 +217,9 @@ export const BOMMA_TESSENDERLO_DATA = {
       net_annual_total_eur: 1368.00,
       delta_vs_current_eur: 117.00,
       delta_pct: 7.9,
-      is_recommended: false,
-      action_status: 'Beste Commerciële Switch',
-      highlight: '100% vaste prijs en telefonische klantendienst. €1.368/jr mét eDeal welkomstkorting; €1.616/jr zonder korting (exact berekend op 2,96 kW piek).'
+      is_recommended: true,
+      action_status: 'Aanbevolen Switch (Senioren Vriendelijk)',
+      highlight: '100% vaste prijs voor 12 maanden en telefonische helpdesk voor Bomma. €1.368/jr mét eDeal welkomstkorting; €1.616/jr zonder korting (exact berekend op 2,96 kW piek).'
     },
     {
       id: 'luminus_basicflex_proposed',
@@ -262,6 +241,27 @@ export const BOMMA_TESSENDERLO_DATA = {
       is_current: true,
       action_status: 'Voorschot naar €125/mnd!',
       highlight: 'Geen telefonische helpdesk. Reële jaarkost schommelt rond €1.485. Voorschot moet direct naar €125/mnd om €400 opleg in juni 2027 te vermijden. Geen 2-jaars lock-in: altijd opzegbaar met 3 wkn.'
+    },
+    {
+      id: 'sociaal_tarief_bomma',
+      provider: 'Federale Overheid / CREG',
+      name: 'Sociaal Tarief (Indien IGO / BIM)',
+      badge: '🔍 Check Pensioenfiche',
+      badge_color: 'amber',
+      type: 'Geplafonneerd Tarief',
+      formula_elec: '25,66 - 26,85 c€/kWh (€0 nettarieven)',
+      formula_gas: '6,08 c€/kWh (geen toeslagen)',
+      inj_rate_c_kwh: 0,
+      fixed_fee_annual_eur: 0,
+      elec_cost_eur: 405,
+      gas_cost_eur: 340,
+      inj_credit_eur: 0,
+      net_annual_total_eur: 745.00,
+      delta_vs_current_eur: 740.00,
+      delta_pct: 49.8,
+      is_recommended: false,
+      action_status: 'Sanity Check: Check Fiche',
+      highlight: 'Kans is waarschijnlijk klein, maar als Jacqueline IGO, GRAPA of BIM geniet, zakt haar kost naar €745/jr. Even 1x checken op haar pensioenfiche om uit te sluiten.'
     }
   ],
   monthly_breakdown: [
